@@ -1,0 +1,25 @@
+= form_for @main_hot_catch_log do |f|
+  - if @main_hot_catch_log.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@main_hot_catch_log.errors.count, "error")} prohibited this main_hot_catch_log from being saved:"
+      %ul
+        - @main_hot_catch_log.errors.full_messages.each do |message|
+          %li= message
+
+  .field
+    = f.label :log_data
+    = f.text_area :log_data
+  .field
+    = f.label :count_log
+    = f.number_field :count_log
+  .field
+    = f.label :id_log_origin_app
+    = f.number_field :id_log_origin_app
+  .field
+    = f.label :name_app
+    = f.text_field :name_app
+  .field
+    = f.label :from_log
+    = f.text_field :from_log
+  .actions
+    = f.submit 'Save'
