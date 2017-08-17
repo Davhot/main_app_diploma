@@ -20,6 +20,7 @@ gem 'jbuilder', '~> 2.5'
 # my gems
 gem "haml-rails"
 gem 'rails-i18n'
+gem 'figaro'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
