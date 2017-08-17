@@ -26,30 +26,16 @@ class MainHotCatchLogsController < ApplicationController
   # POST /main_hot_catch_logs.json
   def create
     p = main_hot_catch_log_params
+    p1, p2, p3 = p[:id_log_origin_app], p[:name_app], p[:count_log]
     respond_to do |format|
-      unless p[:id_log] && p[:name_app] && p[:count_log] &&
-        MainHotCatchLog.find_and_count_log_if_exist(p[:id_log], p[:name_app], p[:count_log])
-        @main_hot_catch_log = MainHotCatchLog.new(main_hot_catch_log_params)
-        if @main_hot_catch_log.save
-          format.json { head :ok }
-        else
-          format.json { render json: @main_hot_catch_log.errors, status: :unprocessable_entity }
-        end
-      else
+      is_found_log = MainHotCatchLog.find_and_count_log_if_exist(p1, p2, p3)
+      @main_hot_catch_log = MainHotCatchLog.new(main_hot_catch_log_params) unless is_found_log
+      if is_found_log || @main_hot_catch_log.save
         format.json { head :ok }
+      else
+        format.json { render json: @main_hot_catch_log.errors, status: :unprocessable_entity }
       end
     end
-    # @main_hot_catch_log = MainHotCatchLog.new(main_hot_catch_log_params)
-    #
-    # respond_to do |format|
-    #   if @main_hot_catch_log.save
-    #     format.html { redirect_to @main_hot_catch_log, notice: 'Main hot catch log was successfully created.' }
-    #     format.json { render :show, status: :created, location: @main_hot_catch_log }
-    #   else
-    #     format.html { render :new }
-    #     format.json { render json: @main_hot_catch_log.errors, status: :unprocessable_entity }
-    #   end
-    # end
   end
 
   # PATCH/PUT /main_hot_catch_logs/1

@@ -10,10 +10,15 @@ class MainHotCatchLog < ApplicationRecord
   validates :from_log, presence: true, inclusion: {in: FROM}
   validates :status, inclusion: {in: STATUSES}
 
-
+  # Функция нахождения существующего лога и если есть, то изменить счётчик
+  # Возвращает значение "найдена ли запись?"
   def self.find_and_count_log_if_exist(id_log, name_app, count_log)
-    l = MainHotCatchLog.where(id_log_origin_app: id_log, name_app: name_app).first
-    l.update_attribute(:count_log, count_log) if l.present?
-    l.present?
+    if id_log && name_app && count_log
+      l = MainHotCatchLog.where(id_log_origin_app: id_log, name_app: name_app).first
+      l.update_attribute(:count_log, count_log) if l.present?
+      return l.present?
+    else
+      return false
+    end
   end
 end
