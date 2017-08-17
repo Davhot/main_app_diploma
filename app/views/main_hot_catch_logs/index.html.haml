@@ -1,28 +1,29 @@
-%h1 Listing main_hot_catch_logs
+-# %h1 Listing main_hot_catch_logs
 
-%table
-  %thead
-    %tr
-      %th Log data
-      %th Count log
-      %th Id log origin app
-      %th Name app
-      %th From log
-      %th
-      %th
-      %th
-
-  %tbody
-    - @main_hot_catch_logs.each do |main_hot_catch_log|
+- for app in MainHotCatchLog.pluck(:name_app).uniq do
+  %h1= app
+  %table
+    %thead
       %tr
-        %td= main_hot_catch_log.log_data
-        %td= main_hot_catch_log.count_log
-        %td= main_hot_catch_log.id_log_origin_app
-        %td= main_hot_catch_log.name_app
-        %td= main_hot_catch_log.from_log
-        %td= link_to 'Show', main_hot_catch_log
-        %td= link_to 'Edit', edit_main_hot_catch_log_path(main_hot_catch_log)
-        %td= link_to 'Destroy', main_hot_catch_log, method: :delete, data: { confirm: 'Are you sure?' }
+        %th Log data
+        %th Count log
+        %th Id log origin app
+        %th Name app
+        %th From log
+        %th
+        %th
+        %th
+    %tbody
+      - for main_hot_catch_log in MainHotCatchLog.where(name_app: app) do
+        %tr
+          %td= main_hot_catch_log.log_data.split("\n")[0]
+          %td= main_hot_catch_log.count_log
+          %td= main_hot_catch_log.id_log_origin_app
+          %td= main_hot_catch_log.name_app
+          %td= main_hot_catch_log.from_log
+          %td= link_to 'Show', main_hot_catch_log
+          %td= link_to 'Edit', edit_main_hot_catch_log_path(main_hot_catch_log)
+          %td= link_to 'Destroy', main_hot_catch_log, method: :delete, data: { confirm: 'Are you sure?' }
 
 %br
 

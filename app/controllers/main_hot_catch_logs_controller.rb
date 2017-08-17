@@ -25,8 +25,19 @@ class MainHotCatchLogsController < ApplicationController
   # POST /main_hot_catch_logs
   # POST /main_hot_catch_logs.json
   def create
+    p = main_hot_catch_log_params
     respond_to do |format|
-      format.json {head :ok}
+      unless p[:id_log] && p[:name_app] && p[:count_log] &&
+        MainHotCatchLog.find_and_count_log_if_exist(p[:id_log], p[:name_app], p[:count_log])
+        @main_hot_catch_log = MainHotCatchLog.new(main_hot_catch_log_params)
+        if @main_hot_catch_log.save
+          format.json { head :ok }
+        else
+          format.json { render json: @main_hot_catch_log.errors, status: :unprocessable_entity }
+        end
+      else
+        format.json { head :ok }
+      end
     end
     # @main_hot_catch_log = MainHotCatchLog.new(main_hot_catch_log_params)
     #
@@ -73,6 +84,7 @@ class MainHotCatchLogsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def main_hot_catch_log_params
-      params.require(:main_hot_catch_log).permit(:log_data, :count_log, :id_log_origin_app, :name_app, :from_log)
+      params.require(:main_hot_catch_log).permit(:log_data, :count_log,
+        :id_log_origin_app, :name_app, :from_log, :status)
     end
 end
