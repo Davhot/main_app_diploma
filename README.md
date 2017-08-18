@@ -12,11 +12,17 @@
 
 P.S. id_log_origin_app и name_app уникальны в совокупности, следовательно
 все логи от одного приложения должны находиться в одной таблице базы данных.
+Кроме того, можно не присылать count_log, по умолчанию единица.
 
 Гем, предоставляющий возможность отправки логов в главное приложение и логирующий все запросы в базу данных:
 `gem hot_catch`
 
 Пример запроса:
-`{"log_data":"some message","name_app":"diploma_app",
-  "count_log":"1","id_log_origin_app":"2",
-  "from_log":"Rails","status":"SERVER_ERROR"}`
+`{main_hot_catch_logs: {
+  "log_data":"some message",
+  "name_app":"diploma_app",
+  "count_log":"1",
+  "id_log_origin_app":"2",
+  "from_log":"Rails",
+  "status":"SERVER_ERROR"}
+}`
