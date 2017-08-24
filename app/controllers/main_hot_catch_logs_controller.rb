@@ -26,13 +26,16 @@ class MainHotCatchLogsController < ApplicationController
   # POST /main_hot_catch_logs.json
   def create
     p = params[:main_hot_catch_log]
-    # raise params[:main_hot_catch_log].to_s
     p1, p2, p3 = p[:id_log_origin_app], p[:name_app], p[:count_log]
     respond_to do |format|
       is_found_log = MainHotCatchLog.find_and_count_log_if_exist(p1, p2, p3)
       @main_hot_catch_log = MainHotCatchLog.new(main_hot_catch_log_params) unless is_found_log
-      # raise params.to_s if p[:name_app] == "my_app101" && !(is_found_log)
       if is_found_log || @main_hot_catch_log.save
+        unless (a = HotCatchApp.where(name: @main_hot_catch_log.name_app).first).present?
+          a = HotCatchApp.create(name: @main_hot_catch_log.name_app)
+        end
+        a.main_hot_catch_logs << @main_hot_catch_log
+
         format.json { head :ok }
       else
         format.json { render json: @main_hot_catch_log.errors, status: :unprocessable_entity }

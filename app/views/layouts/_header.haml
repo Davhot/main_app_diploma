@@ -1,0 +1,18 @@
+%nav.navbar.navbar-inverse.navbar-fixed-top
+  .container-fluid
+    .navbar-header
+      %button.navbar-toggle.collapsed{type: "button", "data-toggle": "collapse",
+      "data-target": "#bs-example-navbar-collapse-1", "aria-expanded": "false"}
+        %span.sr-only
+          Toggle navigation
+        %span.icon-bar
+        %span.icon-bar
+        %span.icon-bar
+      %a.navbar-brand
+        = link_to image_tag("logo.png", alt:"LOGO", id:"logo"), "#"
+    .collapse.nav.navbar-collapse.navbar-right#bs-example-navbar-collapse-1
+      #lk
+        =link_to "Личный кабинет", "#"
+        %span#delim
+          |
+        =link_to "Выход", "#"

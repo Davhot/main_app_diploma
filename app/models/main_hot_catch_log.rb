@@ -1,4 +1,6 @@
 class MainHotCatchLog < ApplicationRecord
+  belongs_to :hot_catch_app
+  
   STATUSES = %w( STATUS SUCCESS REDIRECTION CLIENT_ERROR SERVER_ERROR WARNING )
   FROM = %w( Rails Client Puma Nginx )
 

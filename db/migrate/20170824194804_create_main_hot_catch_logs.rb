@@ -7,6 +7,7 @@ class CreateMainHotCatchLogs < ActiveRecord::Migration[5.0]
       t.string :name_app, null: false
       t.string :from_log, null: false
       t.string :status
+      t.references :hot_catch_app, index: true, foreign_key: true
 
       t.timestamps
 

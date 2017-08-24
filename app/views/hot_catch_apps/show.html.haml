@@ -1,0 +1,9 @@
+%p#notice= notice
+
+%p
+  %b Name:
+  = @hot_catch_app.name
+
+= link_to 'Edit', edit_hot_catch_app_path(@hot_catch_app)
+\|
+= link_to 'Back', hot_catch_apps_path

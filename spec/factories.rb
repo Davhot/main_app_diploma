@@ -1,4 +1,7 @@
 FactoryGirl.define do
+  factory :hot_catch_app do
+    name "MyString"
+  end
   factory :main_hot_catch_log do
     log_data            "some message"
     count_log           1

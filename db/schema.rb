@@ -10,10 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170816124804) do
+ActiveRecord::Schema.define(version: 20170824194804) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "hot_catch_apps", force: :cascade do |t|
+    t.string   "name",       null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "main_hot_catch_logs", force: :cascade do |t|
     t.text     "log_data",                      null: false
@@ -22,9 +28,12 @@ ActiveRecord::Schema.define(version: 20170816124804) do
     t.string   "name_app",                      null: false
     t.string   "from_log",                      null: false
     t.string   "status"
+    t.integer  "hot_catch_app_id"
     t.datetime "created_at",                    null: false
     t.datetime "updated_at",                    null: false
+    t.index ["hot_catch_app_id"], name: "index_main_hot_catch_logs_on_hot_catch_app_id", using: :btree
     t.index ["id_log_origin_app", "name_app"], name: "index_main_hot_catch_logs_on_id_log_origin_app_and_name_app", unique: true, using: :btree
   end
 
+  add_foreign_key "main_hot_catch_logs", "hot_catch_apps"
 end

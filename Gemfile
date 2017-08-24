@@ -21,6 +21,8 @@ gem 'jbuilder', '~> 2.5'
 gem "haml-rails"
 gem 'rails-i18n'
 gem 'figaro'
+gem 'bootstrap-sass'
+gem 'font-awesome-rails'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
