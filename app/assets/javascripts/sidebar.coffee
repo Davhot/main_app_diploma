@@ -13,4 +13,3 @@ $(document).ready ready
 
 $(document).on 'page:load', togglef
 $(document).ready togglef
- 

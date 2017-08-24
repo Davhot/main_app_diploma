@@ -1,40 +1,42 @@
 /*********************************/
 // Main part
 #main-container
-    min-height: $min-height-main-content !important
-    padding-top: $offset-main-content
-    background-color: $main-block-color
+  min-height: $min-height-main-content !important
+  padding-top: $offset-main-content
+  background-color: $main-block-color
 
 #pagination
-    width: 100%
-    text-align: center
+  width: 100%
+  text-align: center
 
 // apps part
 #apps-table
-    background-color: white
-    width: 90%
-    margin-left: 5%
-    margin-top: 1em
-    span
-        font-size: 0.8em
-    thead
-        background-color: $main-apps-header-color
-        border: 1px solid black
-        font-size: 2em
-    th
-        border-bottom: 1px solid black
-    tbody
-        tr:hover
-            background-color: #eee
-        td
-            font-size: 1.5em
-        a
-            color: $link-color
-        a:hover
-            text-decoration: none
-            color: $link-color-hover
-    tr *:nth-child(3)
-        text-align: right
+  background-color: white
+  width: 90%
+  margin-left: 5%
+  margin-top: 1em
+  tbody tr
+    cursor: pointer
+  span
+    font-size: 0.8em
+  thead
+    background-color: $main-apps-header-color
+    border: 1px solid black
+    font-size: 2em
+  th
+    border-bottom: 1px solid black
+  tbody
+    tr:hover
+      background-color: #eee
+    td
+      font-size: 1.5em
+    a
+      color: $link-color
+    a:hover
+      text-decoration: none
+      color: $link-color-hover
+  tr *:nth-child(3)
+    text-align: right
 
 // errors part
 .filter-container
@@ -87,8 +89,11 @@
     span
         font-size: 1em
 div[id^="er"]
-    p
-        padding: 1em
+  display: none
+  p
+    padding: 1em
+
+
 
 .error-first-line
     width: 85%

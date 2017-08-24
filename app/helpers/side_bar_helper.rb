@@ -5,7 +5,8 @@ module SideBarHelper
       :name => 'На главную',
       :icon => 'list',
       :controller => :hot_catch_apps,
-      :action => :index
+      :action => :index,
+      :class => "long"
     }
     # result << {
     #   :name => 'Администрирование',

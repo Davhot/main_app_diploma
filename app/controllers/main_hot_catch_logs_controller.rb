@@ -31,10 +31,12 @@ class MainHotCatchLogsController < ApplicationController
       is_found_log = MainHotCatchLog.find_and_count_log_if_exist(p1, p2, p3)
       @main_hot_catch_log = MainHotCatchLog.new(main_hot_catch_log_params) unless is_found_log
       if is_found_log || @main_hot_catch_log.save
-        unless (a = HotCatchApp.where(name: @main_hot_catch_log.name_app).first).present?
-          a = HotCatchApp.create(name: @main_hot_catch_log.name_app)
+        unless is_found_log
+          unless (a = HotCatchApp.where(name: @main_hot_catch_log.name_app).first).present?
+            a = HotCatchApp.create(name: @main_hot_catch_log.name_app)
+          end
+          a.main_hot_catch_logs << @main_hot_catch_log
         end
-        a.main_hot_catch_logs << @main_hot_catch_log
 
         format.json { head :ok }
       else

@@ -10,11 +10,11 @@
           %span.badge Ошибки
     %tbody
       -for app in @hot_catch_apps do
-        %tr
+        %tr{"data-link": "#{hot_catch_app_path(app)}"}
           %td= app.id
-          %td= link_to app.name, hot_catch_app(app)
+          %td= app.name
           %td
-            %span.badge 42
+            %span.badge= app.count_errors
 
   %p#pagination &lt;&lt;|1|2|..|100|101|&gt;&gt;
 

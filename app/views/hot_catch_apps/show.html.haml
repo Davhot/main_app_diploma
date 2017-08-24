@@ -1,9 +1,45 @@
-%p#notice= notice
+.row
+  .filter-container
+    %header Фильтры
+    %div
+      = link_to "All", "#", class: "link-no-style active-filter-button"
+      = link_to "Rails", "#", class: "filter-button link-no-style"
+      = link_to "Nginx", "#", class: "filter-button link-no-style"
+      = link_to "All", "#", class: "filter-button link-no-style"
+      = link_to "Rails", "#", class: "filter-button link-no-style"
+      = link_to "Nginx", "#", class: "filter-button link-no-style"
+      = link_to "All", "#", class: "filter-button link-no-style"
+      = link_to "Rails", "#", class: "filter-button link-no-style"
+      = link_to "Nginx", "#", class: "filter-button link-no-style"
 
-%p
-  %b Name:
-  = @hot_catch_app.name
+.row
+  .filter-container
+    %header Ошибки
+    - for i in 1 .. 5 do
+      .error
+        %table{class: "error-first-line", "data-toggle-error": "#er-#{i}"}
+          %tr
+            %td= i
+            %td Первая строка ошибки Первая строка ошибки Первая строка ошибки Первая строка ошибки Первая строка ошибки Первая строка</td>
+            %td
+              %span.badge 42
 
-= link_to 'Edit', edit_hot_catch_app_path(@hot_catch_app)
-\|
-= link_to 'Back', hot_catch_apps_path
+        %div{id: "er-#{i}"}
+          %hr
+          %p
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus eveniet, blanditiis facilis. Cupiditate ratione magni laboriosam voluptate nostrum sint provident, velit, numquam eveniet, iusto voluptatum hic asperiores, itaque eligendi. Nemo.
+          %hr
+          %p Статус: CLIENT_ERROR
+
+  %p#pagination &lt;&lt;|1|2|..|100|101|&gt;&gt;
+
+
+-# %p#notice= notice
+-#
+-# %p
+-#   %b Name:
+-#   = @hot_catch_app.name
+-#
+-# = link_to 'Edit', edit_hot_catch_app_path(@hot_catch_app)
+-# \|
+-# = link_to 'Back', hot_catch_apps_path
