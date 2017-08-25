@@ -2,37 +2,20 @@
   .filter-container
     %header Фильтры
     %div
-      = link_to "All", "#", class: "link-no-style active-filter-button"
-      = link_to "Rails", "#", class: "filter-button link-no-style"
-      = link_to "Nginx", "#", class: "filter-button link-no-style"
-      = link_to "All", "#", class: "filter-button link-no-style"
-      = link_to "Rails", "#", class: "filter-button link-no-style"
-      = link_to "Nginx", "#", class: "filter-button link-no-style"
-      = link_to "All", "#", class: "filter-button link-no-style"
-      = link_to "Rails", "#", class: "filter-button link-no-style"
-      = link_to "Nginx", "#", class: "filter-button link-no-style"
+      = link_to "All", hot_catch_app_path(@hot_catch_app, type: "all-filter"), remote: true,
+      class: "filter-button link-no-style", id: "all-filter"
+
+      = link_to "Rails&nbsp;Server".html_safe,
+      hot_catch_app_path(@hot_catch_app, type: "rails-server-filter"), remote: true,
+      class: "filter-button link-no-style", id: "rails-server-filter"
+
+      = link_to "Rails&nbsp;Client".html_safe,
+      hot_catch_app_path(@hot_catch_app, type: "rails-client-filter"), remote: true,
+      class: "filter-button link-no-style", id: "rails-client-filter"
 
 .row
-  .filter-container
-    %header Ошибки
-    - i = 0
-    - for log in @logs do
-      - i += 1
-      .error
-        %table{class: "error-first-line", "data-toggle-error": "#er-#{i}"}
-          %tr
-            %td.n-item-error= i
-            %td= log.log_data.split("\n")[0]
-            %td
-              %span.badge.badge-error= log.count_log
-
-        %div{id: "er-#{i}"}
-          %hr
-          %p= log.log_data
-          %hr
-          %p
-            %b Статус:
-            = log.status
+  .filter-container#app-errors
+    = render "app_errors"
 
   .pagination-block= will_paginate @logs, renderer: BootstrapPagination::Rails
 

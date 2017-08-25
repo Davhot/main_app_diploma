@@ -9,12 +9,15 @@
         %th
           %span.badge Ошибки
     %tbody
-      -for app in @hot_catch_apps do
-        %tr{"data-link": "#{hot_catch_app_path(app)}"}
-          %td= app.id
-          %td= app.name
-          %td
-            %span.badge.badge-error= app.count_errors
+      - if @hot_catch_apps.count == 0
+        %p.alert.alert-info Приложений не найдено.
+      - else
+        -for app in @hot_catch_apps do
+          %tr{"data-link": "#{hot_catch_app_path(app)}"}
+            %td= app.id
+            %td= app.name
+            %td
+              %span.badge.badge-error= app.count_errors
 
   .pagination-block= will_paginate @hot_catch_apps, renderer: BootstrapPagination::Rails
 

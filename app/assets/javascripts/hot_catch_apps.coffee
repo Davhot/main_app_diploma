@@ -13,5 +13,5 @@ apps_functions = ->
   link_app()
   toggle_errors()
 
-$(document).on 'page:load', apps_functions
-$(document).ready apps_functions
+$(document).on 'turbolinks:load', apps_functions
+# $(document).ready apps_functions

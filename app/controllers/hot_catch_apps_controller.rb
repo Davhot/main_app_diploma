@@ -10,7 +10,21 @@ class HotCatchAppsController < ApplicationController
   # GET /hot_catch_apps/1
   # GET /hot_catch_apps/1.json
   def show
-    @logs = @hot_catch_app.main_hot_catch_logs.paginate(:page => params[:page])
+    @logs = @hot_catch_app.main_hot_catch_logs
+    unless !params[:type].present? || (params[:type] == "all-filter")
+      case params[:type]
+      when "rails-server-filter"
+        @logs = @logs.where(from_log: "Rails", status: "SERVER_ERROR")
+      when "rails-client-filter"
+        @logs = @logs.where(from_log: "Rails", status: "CLIENT_ERROR")
+      end
+    end
+    @logs = @logs.paginate(:page => params[:page])
+    respond_to do |format|
+      @filter = params[:type]
+      format.js {render layout: false}
+      format.html
+    end
   end
 
   # GET /hot_catch_apps/new
