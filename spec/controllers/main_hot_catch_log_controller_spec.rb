@@ -4,14 +4,6 @@ RSpec.describe MainHotCatchLogsController, :type => :controller do
 
   before(:all) {3.times{ FactoryGirl.create(:main_hot_catch_log) }}
 
-  describe "GET #index" do
-    it "responds successfully with an HTTP 200 status code" do
-      get :index
-      expect(response).to be_success
-      expect(response).to have_http_status(200)
-    end
-  end
-
   describe "POST #create" do
     describe "found log" do
       it "hasn't count_log in params" do

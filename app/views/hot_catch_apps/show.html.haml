@@ -15,24 +15,35 @@
 .row
   .filter-container
     %header Ошибки
-    - for i in 1 .. 5 do
+    - i = 0
+    - for log in @logs do
+      - i += 1
       .error
         %table{class: "error-first-line", "data-toggle-error": "#er-#{i}"}
           %tr
-            %td= i
-            %td Первая строка ошибки Первая строка ошибки Первая строка ошибки Первая строка ошибки Первая строка ошибки Первая строка</td>
+            %td.n-item-error= i
+            %td= log.log_data.split("\n")[0]
             %td
-              %span.badge 42
+              %span.badge.badge-error= log.count_log
 
         %div{id: "er-#{i}"}
           %hr
-          %p
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus eveniet, blanditiis facilis. Cupiditate ratione magni laboriosam voluptate nostrum sint provident, velit, numquam eveniet, iusto voluptatum hic asperiores, itaque eligendi. Nemo.
+          %p= log.log_data
           %hr
-          %p Статус: CLIENT_ERROR
+          %p
+            %b Статус:
+            = log.status
 
-  %p#pagination &lt;&lt;|1|2|..|100|101|&gt;&gt;
+  .pagination-block= will_paginate @logs, renderer: BootstrapPagination::Rails
 
+-#           %td= main_hot_catch_log.log_data.split("\n")[0]
+-#           %td= main_hot_catch_log.count_log
+-#           %td= main_hot_catch_log.id_log_origin_app
+-#           %td= main_hot_catch_log.name_app
+-#           %td= main_hot_catch_log.from_log
+-#           %td= link_to 'Show', main_hot_catch_log
+-#           %td= link_to 'Edit', edit_main_hot_catch_log_path(main_hot_catch_log)
+-#           %td= link_to 'Destroy', main_hot_catch_log, method: :delete, data: { confirm: 'Are you sure?' }
 
 -# %p#notice= notice
 -#

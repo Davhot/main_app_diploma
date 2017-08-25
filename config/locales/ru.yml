@@ -1,2 +1,5 @@
 ru:
   hello: "Здравствуй, мир!"
+  will_paginate:
+    previous_label: "<<"
+    next_label: ">>"

@@ -4,12 +4,13 @@ class HotCatchAppsController < ApplicationController
   # GET /hot_catch_apps
   # GET /hot_catch_apps.json
   def index
-    @hot_catch_apps = HotCatchApp.all
+    @hot_catch_apps = HotCatchApp.paginate(:page => params[:page])
   end
 
   # GET /hot_catch_apps/1
   # GET /hot_catch_apps/1.json
   def show
+    @logs = @hot_catch_app.main_hot_catch_logs.paginate(:page => params[:page])
   end
 
   # GET /hot_catch_apps/new

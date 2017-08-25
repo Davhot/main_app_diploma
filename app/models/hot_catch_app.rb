@@ -1,6 +1,8 @@
 class HotCatchApp < ApplicationRecord
   has_many :main_hot_catch_logs
 
+  self.per_page = 10 # пагинация
+
   validates :name, presence: true, uniqueness: true
 
   def count_errors

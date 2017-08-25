@@ -1,6 +1,7 @@
 $sidebar-width: 250px
-$sidebar-bg: #F2F2F2
-$sidebar-link-color: lighten($gray-base, 40%) //#b3b8c3
+$sidebar-bg: lighten(black, 20%)
+// $sidebar-link-color: lighten($gray-base, 40%)
+$sidebar-link-color: white
 $sidebar-link-hover-bg: #aaf
 
 $sidebar-right-border-color: #006
@@ -37,8 +38,8 @@ $sidebar-right-border-color: #006
       width: $sidebar-width
     #sidebar-toggle
       left: $sidebar-width
-    #page-content-wrapper
-      position: absolute
+    // #page-content-wrapper
+    //   position: absolute
       // margin-right: -$sidebar-width
 
 #sidebar-wrapper
@@ -184,7 +185,7 @@ $sidebar-right-border-color: #006
         color: #fff
         background: none
 
-@media (min-width: $screen-xs)
+@media (min-width: $screen-sm)
   #page-content-wrapper
     padding: 15px
   #wrapper

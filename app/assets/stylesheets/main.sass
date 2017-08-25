@@ -24,3 +24,19 @@ hr
     margin: 0
     padding: 0
     border-top: 1px solid black
+
+.badge-error
+    background-color: darken(red, 20%)
+
+// ПАГИНАЦИЯ
+.pagination-block
+    width: 100%
+    text-align: center
+.pagination > li:first-child
+    & > span, & > a
+        border-bottom-left-radius: 1em
+        border-top-left-radius: 1em
+.pagination > li:last-child
+    & > span, & > a
+        border-bottom-right-radius: 1em
+        border-top-right-radius: 1em

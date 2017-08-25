@@ -14,9 +14,9 @@
           %td= app.id
           %td= app.name
           %td
-            %span.badge= app.count_errors
+            %span.badge.badge-error= app.count_errors
 
-  %p#pagination &lt;&lt;|1|2|..|100|101|&gt;&gt;
+  .pagination-block= will_paginate @hot_catch_apps, renderer: BootstrapPagination::Rails
 
 -# %h1 Listing hot_catch_apps
 -#
