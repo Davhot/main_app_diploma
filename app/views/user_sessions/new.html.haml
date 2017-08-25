@@ -1,0 +1,27 @@
+= form_tag try_login_path, :method => :post do
+  .sign_in_up_block
+    .row
+      .col-md-12
+        .form-group
+          .input-group.input-group-md
+            %span.input-group-addon
+              %i.fa.fa-user.px25
+            = text_field_tag :email, '', class: 'form-control', placeholder: User.human_attribute_name(:email)
+    .row
+      .col-md-12
+        .form-group
+          .input-group.input-group-md
+            %span.input-group-addon
+              %i.fa.fa-key.px25
+            = password_field_tag :password, '', class: 'form-control', placeholder: User.human_attribute_name(:password)
+    .row
+      .col-md-12
+        .checkbox
+          %label
+            = check_box_tag :remember_me, false, true
+            Запомнить меня
+    .row
+      .form-actions
+        .col-md-12
+          = submit_tag "Войти", class: 'btn btn-primary'
+          = link_to "Регистрация", signup_path, class: 'link btn'

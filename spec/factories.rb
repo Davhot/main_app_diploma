@@ -1,4 +1,8 @@
 FactoryGirl.define do
+  factory :user do
+    email "MyString"
+    crypted_password "MyString"
+  end
   factory :hot_catch_app do
     name "MyString"
   end
