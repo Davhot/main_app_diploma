@@ -42,7 +42,41 @@ hr
         background-color: #ccc
     &:focus
         text-decoration: none
-// ПАГИНАЦИЯ
+
+.page-header
+    padding-top: 0
+    margin-top: 0
+
+.growl-msg
+    display: none
+
+.alert-block
+    position: absolute
+    right: 0
+    top: 70px
+    z-index: 5
+    margin-right: 30px
+    opacity: .8
+
+.breadcrumb
+    text-align: left
+    margin: 0px 0px 0px 0px
+    padding: 0px 0px 0px 0px
+
+.alert-label
+    @extend .alert
+    padding: 5px 15px 5px 15px
+    margin-bottom: 15px
+    font-size: 85%
+    font-family: Intro
+    width: 100px
+    text-align: center
+    border-radius: 7px
+    $x_sizes: (150 200 300 400 500 600)
+    @each $x_size in $x_sizes
+        &.x#{$x_size}
+            width: #{$x_size}px
+
 .pagination-block
     width: 100%
     text-align: center

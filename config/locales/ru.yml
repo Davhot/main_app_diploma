@@ -1,5 +1,14 @@
 ru:
   hello: "Здравствуй, мир!"
   will_paginate:
-    previous_label: "<<"
-    next_label: ">>"
+    previous_label: "←"
+    next_label: "→"
+
+  activerecord:
+    models:
+      user: Пользователь
+  attributes:
+    user:
+      email: Электронная почта
+      password: Пароль
+      password_confirmation: Подтверждение пароля

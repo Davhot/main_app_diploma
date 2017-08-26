@@ -1,4 +1,12 @@
 FactoryGirl.define do
+  factory :role_user do
+    
+  end
+  factory :role do
+    name "MyString"
+    info "MyString"
+    full_info "MyString"
+  end
   factory :user do
     email "MyString"
     crypted_password "MyString"

@@ -12,7 +12,7 @@
         = link_to image_tag("logo.png", alt:"LOGO", id:"logo"), root_path
     .collapse.nav.navbar-collapse.navbar-right#bs-example-navbar-collapse-1
       #lk
-        =link_to "Личный кабинет", "#"
-        %span#delim
-          |
-        =link_to "Выход", "#"
+        - if current_user
+          = link_to "Выход", :logout, method: :post
+        - else
+          = link_to "Вход", :login

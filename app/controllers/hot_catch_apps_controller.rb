@@ -1,6 +1,8 @@
 class HotCatchAppsController < ApplicationController
   before_action :set_hot_catch_app, only: [:show, :edit, :update, :destroy]
 
+  before_action -> {redirect_if_not_one_of_role_in ["admin"]}
+  
   # GET /hot_catch_apps
   # GET /hot_catch_apps.json
   def index

@@ -9,15 +9,22 @@ class UserSessionsController < ApplicationController
 
   def create
     if @user = login(params[:email], params[:password])
-      redirect_back_or_to(:users, notice: 'Login successful')
+      redirect_back_or_to(:hot_catch_apps, notice: 'Вход выполнен')
     else
-      flash.now[:alert] = 'Login failed'
+      flash[:danger] = "Неверный #{User.human_attribute_name(:email).mb_chars.downcase} или
+#{User.human_attribute_name(:password).mb_chars.downcase}"
       render action: 'new'
     end
   end
 
   def destroy
     logout
-    redirect_to login_path, notice: 'Logged out!'
+    redirect_to login_path, notice: 'Сеанс работы в системе завершен'
+  end
+
+  def insufficient_privileges
+    @current_user_object = current_user
+    @current_user_login = @current_user_object.email
+    @current_role_user = RoleUser.where(id: params['bad_user_role']).first
   end
 end
