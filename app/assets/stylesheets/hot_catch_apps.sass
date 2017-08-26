@@ -11,6 +11,8 @@
   width: 90%
   margin-left: 5%
   margin-top: 1em
+  @media (max-width: $screen-xs)
+      font-size: 0.5em
   tbody tr
     cursor: pointer
   span
@@ -108,3 +110,8 @@ div[id^="er"]
 .n-item-error
     font-size: 1.5em
     font-weight: bold
+
+.scroll-data
+    display: block
+    overflow-x: auto
+    width: 100%

@@ -17,7 +17,7 @@
 
       %div{id: "er-#{i}"}
         %hr
-        %p= log.log_data
+        %pre.scroll_data= log.log_data.gsub("\n", "<br>").html_safe
         %hr
         %p
           %b Статус:
