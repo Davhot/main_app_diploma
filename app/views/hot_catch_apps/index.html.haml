@@ -1,4 +1,7 @@
--provide(:title, 'Приложения')
+-provide(:title, t('app.apps.header_index'))
+
+=breadcrumb_tag do
+  %li.active= t('app.apps.header_index')
 
 .row
   %table.table#apps-table

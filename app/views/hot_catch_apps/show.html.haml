@@ -1,3 +1,8 @@
+-provide(:title, t('app.apps.header_show'))
+=breadcrumb_tag do
+  %li.active= t('app.apps.header_show')
+  %li= link_to t('app.apps.header_index'), hot_catch_apps_path
+
 .row
   .filter-container
     %header Фильтры

@@ -5,7 +5,7 @@ module ApplicationHelper
   end
 
   def breadcrumb_tag(&block)
-    render 'layouts/breadcrumb', block: capture(&block)
+    render 'breadcrumb', block: capture(&block)
   end
 
   ROLE_FOR_METHODS = ['admin', 'operator']

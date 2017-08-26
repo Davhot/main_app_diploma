@@ -1,5 +1,8 @@
 ru:
-  hello: "Здравствуй, мир!"
+  app:
+    apps:
+      header_index: Приложения
+      header_show: Ошибки приложения
   will_paginate:
     previous_label: "←"
     next_label: "→"
