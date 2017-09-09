@@ -11,7 +11,6 @@ class MainHotCatchLogsController < ApplicationController
       if @main_hot_catch_log.set_data_and_save
         format.json { head :ok }
       else
-        raise @main_hot_catch_log.errors.inspect
         format.json { render json: @main_hot_catch_log.errors, status: :unprocessable_entity }
       end
     end
