@@ -3,6 +3,8 @@ require_relative 'boot'
 require 'rails/all'
 require './lib/form_builder.rb'
 
+require './lib/rails_log_parser'
+
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)

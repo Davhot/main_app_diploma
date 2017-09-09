@@ -11,9 +11,14 @@
       %table{class: "error-first-line", "data-toggle-error": "#er-#{i}"}
         %tr
           %td.n-item-error= i
-          %td= log.log_data.split("\n")[0]
           %td
-            %span.badge.badge-error= log.count_log
+            %span{class: "#{case_status_class(log.status)}"}= log.status
+            = log.log_data.split("\n")[0]
+          %td
+            - if log.status == "SUCCESS"
+              %span.badge.badge-success= log.count_log
+            - else
+              %span.badge.badge-error= log.count_log
 
       %div{id: "er-#{i}"}
         %hr
@@ -22,3 +27,7 @@
         %p
           %b Статус:
           = log.status
+        %hr
+        %p
+          %b Последнее обновление:
+          = log.updated_at.strftime("%F %T")

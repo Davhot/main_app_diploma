@@ -2,11 +2,11 @@ class HotCatchAppsController < ApplicationController
   before_action :set_hot_catch_app, only: [:show, :edit, :update, :destroy]
 
   before_action -> {redirect_if_not_one_of_role_in ["admin"]}
-  
+
   # GET /hot_catch_apps
   # GET /hot_catch_apps.json
   def index
-    @hot_catch_apps = HotCatchApp.paginate(:page => params[:page])
+    @hot_catch_apps = HotCatchApp.paginate(:page => params[:page]).order('created_at DESC')
   end
 
   # GET /hot_catch_apps/1
@@ -21,7 +21,7 @@ class HotCatchAppsController < ApplicationController
         @logs = @logs.where(from_log: "Rails", status: "CLIENT_ERROR")
       end
     end
-    @logs = @logs.paginate(:page => params[:page])
+    @logs = @logs.paginate(:page => params[:page]).order('created_at DESC')
     respond_to do |format|
       @filter = params[:type]
       format.js {render layout: false}

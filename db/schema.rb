@@ -22,17 +22,14 @@ ActiveRecord::Schema.define(version: 20170826094317) do
   end
 
   create_table "main_hot_catch_logs", force: :cascade do |t|
-    t.text     "log_data",                      null: false
-    t.integer  "count_log",         default: 1, null: false
-    t.integer  "id_log_origin_app",             null: false
-    t.string   "name_app",                      null: false
-    t.string   "from_log",                      null: false
-    t.string   "status"
+    t.text     "log_data",                     null: false
+    t.integer  "count_log",        default: 1, null: false
+    t.string   "from_log",                     null: false
+    t.string   "status",                       null: false
     t.integer  "hot_catch_app_id"
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
     t.index ["hot_catch_app_id"], name: "index_main_hot_catch_logs_on_hot_catch_app_id", using: :btree
-    t.index ["id_log_origin_app", "name_app"], name: "index_main_hot_catch_logs_on_id_log_origin_app_and_name_app", unique: true, using: :btree
   end
 
   create_table "role_users", force: :cascade do |t|
