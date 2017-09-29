@@ -2,7 +2,7 @@
 lock "3.9.0"
 
 # ИЗМЕНИТЬ ПОД СЕБЯ
-server '192.168.111.113', roles: [:web, :app, :db], primary: true
+server '192.168.111.115', roles: [:web, :app, :db], primary: true
 
 set :repo_url,        'https://github.com/Davhot/main_app_diploma.git'
 set :application,     'main_app_diploma'
