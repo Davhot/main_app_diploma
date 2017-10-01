@@ -5,6 +5,12 @@
 
 .row
   .filter-container
+    %header
+    %div
+      = link_to "Статистика Nginx", show_nginx_statistic_hot_catch_app_path(@hot_catch_app),
+      class: "filter-button link-no-style"
+.row
+  .filter-container
     %header Фильтры
     %div
       = link_to "All", hot_catch_app_path(@hot_catch_app, type: "all-filter"), remote: true,
@@ -23,22 +29,3 @@
     = render "app_errors"
 
   .pagination-block= will_paginate @logs, renderer: BootstrapPagination::Rails
-
--#           %td= main_hot_catch_log.log_data.split("\n")[0]
--#           %td= main_hot_catch_log.count_log
--#           %td= main_hot_catch_log.id_log_origin_app
--#           %td= main_hot_catch_log.name_app
--#           %td= main_hot_catch_log.from_log
--#           %td= link_to 'Show', main_hot_catch_log
--#           %td= link_to 'Edit', edit_main_hot_catch_log_path(main_hot_catch_log)
--#           %td= link_to 'Destroy', main_hot_catch_log, method: :delete, data: { confirm: 'Are you sure?' }
-
--# %p#notice= notice
--#
--# %p
--#   %b Name:
--#   = @hot_catch_app.name
--#
--# = link_to 'Edit', edit_hot_catch_app_path(@hot_catch_app)
--# \|
--# = link_to 'Back', hot_catch_apps_path

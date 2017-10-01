@@ -23,25 +23,3 @@
               %span.badge.badge-error= app.count_errors
 
   .pagination-block= will_paginate @hot_catch_apps, renderer: BootstrapPagination::Rails
-
--# %h1 Listing hot_catch_apps
--#
--# %table
--#   %thead
--#     %tr
--#       %th Name
--#       %th
--#       %th
--#       %th
--#
--#   %tbody
--#     - @hot_catch_apps.each do |hot_catch_app|
--#       %tr
--#         %td= hot_catch_app.name
--#         %td= link_to 'Show', hot_catch_app
--#         %td= link_to 'Edit', edit_hot_catch_app_path(hot_catch_app)
--#         %td= link_to 'Destroy', hot_catch_app, method: :delete, data: { confirm: 'Are you sure?' }
--#
--# %br
--#
--# = link_to 'New Hot catch app', new_hot_catch_app_path

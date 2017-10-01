@@ -25,17 +25,25 @@ class MainHotCatchLog < ApplicationRecord
 
   # Проверка лога на уникальность
   def process_log_data
-    str = self.log_data
-    parser = RailsLogParser.new
-    self.status = parser.get_status(self.log_data, self.status)
-    str2 = parser.strip_str(str)
-    MainHotCatchLog.where(status: status, hot_catch_app_id: hot_catch_app.id).each do |cur_log|
-      if parser.strip_str(cur_log.log_data) == str2
-        cur_log.update_attribute(:count_log, cur_log.count_log + 1)
-        return true
+    if from_log == "Nginx"
+      i_file = "log/apps/#{hot_catch_app.name.downcase}-nginx.access.log"
+      o_file = "log/apps/#{hot_catch_app.name.downcase}-report.html"
+      File.open(i_file, 'a'){|file| file.write log_data}
+      `goaccess -f #{i_file} -o html > #{o_file}`
+      true
+    else
+      str = self.log_data
+      parser = RailsLogParser.new
+      self.status = parser.get_status(self.log_data, self.status)
+      str2 = parser.strip_str(str)
+      MainHotCatchLog.where(status: status, hot_catch_app_id: hot_catch_app.id).each do |cur_log|
+        if parser.strip_str(cur_log.log_data) == str2
+          cur_log.update_attribute(:count_log, cur_log.count_log + 1)
+          return true
+        end
       end
+      self.log_data = parser.strip_str(str)
+      self.save
     end
-    self.log_data = parser.strip_str(str)
-    self.save
   end
 end
