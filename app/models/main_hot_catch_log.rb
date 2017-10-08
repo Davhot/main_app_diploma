@@ -32,7 +32,7 @@ class MainHotCatchLog < ApplicationRecord
     o_file = "log/apps/#{hot_catch_app.name.downcase}-system.txt"
     file = File.open(o_file, 'a')
 
-    file.puts "#{logs}\n\n"
+    # file.puts "#{logs}\n\n"
 
     logs.each do |key, val|
       if key != "time"

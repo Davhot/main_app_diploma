@@ -9,6 +9,8 @@
     %div
       = link_to "Статистика Nginx", show_nginx_statistic_hot_catch_app_path(@hot_catch_app),
       class: "filter-button link-no-style"
+      = link_to "Статистика системы", show_server_statistic_hot_catch_app_path(@hot_catch_app),
+      class: "filter-button link-no-style"
 .row
   .filter-container
     %header Фильтры

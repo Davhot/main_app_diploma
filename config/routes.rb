@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   resources :hot_catch_apps do
     member do
       get 'show_nginx_statistic', to: "hot_catch_apps#show_nginx_statistic"
+      get 'show_server_statistic', to: "hot_catch_apps#show_server_statistic"
     end
   end
 

@@ -1,5 +1,6 @@
 class HotCatchAppsController < ApplicationController
-  before_action :set_hot_catch_app, only: [:show, :edit, :update, :destroy, :show_nginx_statistic]
+  before_action :set_hot_catch_app, only: [:show, :edit, :update, :destroy,
+    :show_nginx_statistic, :show_server_statistic]
 
   before_action -> {redirect_if_not_one_of_role_in ["admin"]}
 
@@ -10,6 +11,17 @@ class HotCatchAppsController < ApplicationController
     else
       flash[:danger] = "Статистика не найдена"
       redirect_to hot_catch_app_path(@hot_catch_app)
+    end
+  end
+
+  def show_server_statistic
+    o_file = "log/apps/#{@hot_catch_app.name.downcase}-system.txt"
+    unless File.exist? o_file
+      flash[:danger] = "Статистика не найдена"
+      redirect_to hot_catch_app_path(@hot_catch_app)
+    else
+      @server_logs = ""
+      File.open(o_file, 'r'){|file| @server_logs = file.read}
     end
   end
 
