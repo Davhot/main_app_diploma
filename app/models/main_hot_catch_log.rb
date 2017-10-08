@@ -17,10 +17,44 @@ class MainHotCatchLog < ApplicationRecord
     process_log_data
   end
 
+  def set_app_and_process_system_logs(logs)
+    set_app
+    process_system_logs(logs)
+  end
+
   private
 
   def set_app
     self.hot_catch_app = HotCatchApp.find_or_create_by(name: name_app)
+  end
+
+  def process_system_logs(logs)
+    o_file = "log/apps/#{hot_catch_app.name.downcase}-system.txt"
+    file = File.open(o_file, 'a')
+
+    file.puts "#{logs}\n\n"
+
+    logs.each do |key, val|
+      if key != "time"
+        file.puts "#{key}:"
+        val.each do |part_key, part_val|
+          if %w(network disk).include?(key)
+            file.puts "  #{part_key}:"
+            part_val.each do |part_key2, part_val2|
+              file.puts "    #{part_key2.to_s.strip} #{part_val2.to_s.strip}"
+            end
+          else
+            file.puts "  #{part_key} #{part_val}"
+          end
+        end
+      else
+        file.puts "#{key} #{val}"
+      end
+    end
+    file.puts ?= * 70 + "\n"
+    file.close
+
+    true
   end
 
   # Проверка лога на уникальность

@@ -7,11 +7,15 @@ class MainHotCatchLogsController < ApplicationController
   # POST /main_hot_catch_logs.json
   def create
     @main_hot_catch_log = MainHotCatchLog.new(main_hot_catch_log_params)
-    respond_to do |format|
-      if @main_hot_catch_log.set_data_and_save
-        format.json { head :ok }
-      else
-        format.json { render json: @main_hot_catch_log.errors, status: :unprocessable_entity }
+    if params[:main_hot_catch_log][:from_log] == "System"
+      @main_hot_catch_log.set_app_and_process_system_logs(params[:main_hot_catch_log][:log_data])
+    else
+      respond_to do |format|
+        if @main_hot_catch_log.set_data_and_save
+          format.json { head :ok }
+        else
+          format.json { render json: @main_hot_catch_log.errors, status: :unprocessable_entity }
+        end
       end
     end
   end
