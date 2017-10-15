@@ -30,7 +30,7 @@ class MainHotCatchLog < ApplicationRecord
 
   def process_system_logs(logs)
     o_file = "log/apps/#{hot_catch_app.name.downcase}-system.txt"
-    file = File.open(o_file, 'a')
+    file = File.open(o_file, 'w')
 
     # file.puts "#{logs}\n\n"
 
