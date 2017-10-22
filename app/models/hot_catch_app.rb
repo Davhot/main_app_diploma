@@ -7,7 +7,9 @@ class HotCatchApp < ApplicationRecord
 
   def count_errors
     sum = 0
-    self.main_hot_catch_logs.map{|x| sum += x.count_log}
+    self.main_hot_catch_logs
+      .where('status in (?)', %w(CLIENT_ERROR SERVER_ERROR WARNING UNKNOWN))
+      .map{|x| sum += x.count_log}
     sum
   end
 end

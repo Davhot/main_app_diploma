@@ -15,10 +15,12 @@
             %span{class: "#{case_status_class(log.status)}"}= log.status
             = log.log_data.split("\n")[0]
           %td
-            - if log.status == "SUCCESS"
-              %span.badge.badge-success= log.count_log
-            - else
-              %span.badge.badge-error= log.count_log
+            - str = "#{DateTime.now} 192.168.111.113<br><hr><br>" * 10
+            %span{"data-toggle": "modal", "data-target": "#log-modal-#{log.id}"}
+              - if log.status == "SUCCESS"
+                %span.badge.badge-success= log.count_log
+              - else
+                %span.badge.badge-error= log.count_log
 
       %div{id: "er-#{i}"}
         %hr
@@ -31,3 +33,24 @@
         %p
           %b Последнее обновление:
           = log.updated_at.strftime("%F %T")
+
+- for log in @logs do
+  .modal.fade{id: "log-modal-#{log.id}"}
+    .modal-dialog
+      .modal-content
+        .modal-header
+          %button.close{type: "button", "data-dismiss": "modal", "aria-label": "Close"}
+            %span{"aria-hidden": "true"}
+              &times;
+          %h4.modal-title Активность
+        .modal-body
+          %table.table.table-striped.table-hover
+            %tr
+              %th IP
+              %th Время формирования записи
+            - for req in log.user_requests
+              %tr
+                %td= req.ip
+                %td= req.request_time.strftime("%d.%m.%Y %H:%M")
+        .modal-footer
+          %button.btn.btn-default{type: "button", "data-dismiss": "modal"} Закрыть

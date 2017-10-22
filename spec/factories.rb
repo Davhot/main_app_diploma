@@ -1,4 +1,8 @@
 FactoryGirl.define do
+  factory :user_request do
+    ip "MyString"
+    request_time "2017-10-22 17:53:39"
+  end
   factory :role_user do
     
   end

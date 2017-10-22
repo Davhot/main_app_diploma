@@ -15,11 +15,15 @@
       - if @hot_catch_apps.count == 0
         %p.alert.alert-info Приложений не найдено.
       - else
+        - i = 0
         -for app in @hot_catch_apps do
           %tr{"data-link": "#{hot_catch_app_path(app)}"}
-            %td= app.id
+            %td= i += 1
             %td= app.name
             %td
-              %span.badge.badge-error= app.count_errors
+              - if (errors = app.count_errors) > 0
+                %span.badge.badge-error= errors
+              - else
+                %span.badge.badge-success= errors
 
   .pagination-block= will_paginate @hot_catch_apps, renderer: BootstrapPagination::Rails

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170826094317) do
+ActiveRecord::Schema.define(version: 20171022145339) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -52,6 +52,15 @@ ActiveRecord::Schema.define(version: 20170826094317) do
     t.index ["name"], name: "index_roles_on_name", unique: true, using: :btree
   end
 
+  create_table "user_requests", force: :cascade do |t|
+    t.string   "ip",                    null: false
+    t.datetime "request_time",          null: false
+    t.integer  "main_hot_catch_log_id"
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
+    t.index ["main_hot_catch_log_id"], name: "index_user_requests_on_main_hot_catch_log_id", using: :btree
+  end
+
   create_table "users", force: :cascade do |t|
     t.string   "email",                           null: false
     t.string   "crypted_password"
@@ -68,4 +77,5 @@ ActiveRecord::Schema.define(version: 20170826094317) do
   add_foreign_key "main_hot_catch_logs", "hot_catch_apps"
   add_foreign_key "role_users", "roles"
   add_foreign_key "role_users", "users"
+  add_foreign_key "user_requests", "main_hot_catch_logs"
 end

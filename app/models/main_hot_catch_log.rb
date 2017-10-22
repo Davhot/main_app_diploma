@@ -1,5 +1,6 @@
 class MainHotCatchLog < ApplicationRecord
   belongs_to :hot_catch_app
+  has_many :user_requests
   attr_accessor :name_app
 
   self.per_page = 20 # пагинация
@@ -61,22 +62,29 @@ class MainHotCatchLog < ApplicationRecord
   def process_log_data
     if from_log == "Nginx"
       i_file = "log/apps/#{hot_catch_app.name.downcase}-nginx.access.log"
-      o_file = "log/apps/#{hot_catch_app.name.downcase}-report.html"
+      o_file = "log/apps/#{hot_catch_app.name.downcase}-report.json"
       File.open(i_file, 'a'){|file| file.write log_data}
-      `goaccess -f #{i_file} -o html > #{o_file}`
+      `goaccess -f #{i_file} -o json > #{o_file}`
       true
     else
       str = self.log_data
       parser = RailsLogParser.new
+      # Сводка по времени и ip запросов
+      ip, date = parser.get_ip_and_date(str)
+      req = UserRequest.create(ip: ip, request_time: date)
+      # Берём статус запроса
       self.status = parser.get_status(self.log_data, self.status)
       str2 = parser.strip_str(str)
+      # Если есть лог, то count_log += 1
       MainHotCatchLog.where(status: status, hot_catch_app_id: hot_catch_app.id).each do |cur_log|
         if parser.strip_str(cur_log.log_data) == str2
+          cur_log.user_requests << req if req.present?
           cur_log.update_attribute(:count_log, cur_log.count_log + 1)
           return true
         end
       end
       self.log_data = parser.strip_str(str)
+      self.user_requests << req if req.present?
       self.save
     end
   end

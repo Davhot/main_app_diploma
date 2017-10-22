@@ -23,4 +23,9 @@ class RailsLogParser
     end
     status
   end
+
+  def get_ip_and_date(str)
+    [str.match(/((\d{1,3}\.){3}\d{1,3}(:\d*)?)/).try("[]", 1),
+    str.match(/(\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\s\+\d{4})/).try("[]", 1)]
+  end
 end
