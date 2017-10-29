@@ -5,24 +5,31 @@ class HotCatchAppsController < ApplicationController
   before_action -> {redirect_if_not_one_of_role_in ["admin"]}
 
   def show_nginx_statistic
-    @data = JSON.parse(File.open('log/apps/dummy-report2.json', 'r'){|file| file.read})
-    @general = @data["general"]
-    @visitors = @data["visitors"]
-    @requests = @data["requests"]
-    @static_requests = @data["static_requests"]
-    @hosts = @data["hosts"]
-    @os = @data["os"]
-    @browsers = @data["browsers"]
-    @visit_time = @data["visit_time"]
-    @status_codes = @data["status_codes"]
-    @geolocation = @data["geolocation"]
+    o_file = "log/apps/#{@hot_catch_app.name.downcase}-report.json"
+    # o_file = "log/apps/dummy-report2.json"
+    if File.exist? o_file
+      @data = JSON.parse(File.open(o_file, 'r'){|file| file.read})
+      @general = @data["general"]
+      @visitors = @data["visitors"]
+      @requests = @data["requests"]
+      @static_requests = @data["static_requests"]
+      @hosts = @data["hosts"]
+      @os = @data["os"]
+      @browsers = @data["browsers"]
+      @visit_time = @data["visit_time"]
+      @status_codes = @data["status_codes"]
+      @geolocation = @data["geolocation"]
+    else
+      flash[:danger] = "Статистика не найдена"
+      redirect_to hot_catch_apps_path
+    end
   end
 
   def show_server_statistic
     o_file = "log/apps/#{@hot_catch_app.name.downcase}-system.txt"
     unless File.exist? o_file
       flash[:danger] = "Статистика не найдена"
-      redirect_to hot_catch_app_path(@hot_catch_app)
+      redirect_to hot_catch_apps_path
     else
       @server_logs = ""
       File.open(o_file, 'r'){|file| @server_logs = file.read}
