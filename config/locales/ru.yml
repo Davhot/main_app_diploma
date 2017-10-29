@@ -3,6 +3,7 @@ ru:
     apps:
       header_index: Приложения
       header_show: Ошибки приложения
+      nginx: Статистика Nginx
   will_paginate:
     previous_label: "←"
     next_label: "→"

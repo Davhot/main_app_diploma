@@ -36,6 +36,13 @@
   tr *:nth-child(3)
     text-align: right
 
+.nodisplay
+  display: none
+.app-info-tr
+  text-align: center
+  font-size: 1em
+  font-weight: bold
+
 // errors part
 .filter-container
     background-color: white
@@ -44,12 +51,15 @@
     margin-top: 1em
     margin-bottom: 1em
     padding-bottom: 1em
+    padding-top: 1em
     border-radius: 25px
     height: auto
     span
         font-size: 0.8em
     header
-        padding: 0.5em 2em
+        padding: 0em 2em 1em 2em
+        font-size: 1em
+        font-weight: bold
 
 
 .filter-button
@@ -124,3 +134,36 @@ pre
 
 .error-color
   color: $error-color
+
+// NGINX
+.general-nginx
+  margin-bottom: 1em
+  #header-1
+    border-top: 3px solid black
+  #header-2
+    border-top: 3px solid green
+  #header-3
+    border-top: 3px solid red
+  #header-4
+    border-top: 3px solid blue
+.hr5
+  padding-bottom: 0.5em
+.nginx-logs
+  padding: 0 1em
+  h1
+    margin: 0
+  .header
+    font-weight: bold
+    font-size: 0.9em
+    text-align: center
+.nginx-header
+  font-weight: bold
+  font-size: 1.4em
+.nginx-block
+  box-shadow: 0 0 1em black
+  border-radius: 1em
+  padding: 0 1em
+.nginx-count
+  font-size: 2em
+  font-weight: bold
+  text-align: center

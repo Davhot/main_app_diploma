@@ -17,7 +17,7 @@
       - else
         - i = 0
         -for app in @hot_catch_apps do
-          %tr{"data-link": "#{hot_catch_app_path(app)}"}
+          %tr.app
             %td= i += 1
             %td= app.name
             %td
@@ -25,5 +25,11 @@
                 %span.badge.badge-error= errors
               - else
                 %span.badge.badge-success= errors
+          %tr.nodisplay.app-info-tr{"data-link": "#{hot_catch_app_path(app)}"}
+            %td{colspan: 3} Журнал Ruby on Rails
+          %tr.nodisplay.app-info-tr{"data-link": "#{show_nginx_statistic_hot_catch_app_path(app)}"}
+            %td{colspan: 3} Статистика Nginx
+          %tr.nodisplay.app-info-tr{"data-link": "#{show_server_statistic_hot_catch_app_path(app)}"}
+            %td{colspan: 3} Нагрузка на систему
 
   .pagination-block= will_paginate @hot_catch_apps, renderer: BootstrapPagination::Rails

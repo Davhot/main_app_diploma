@@ -5,13 +5,17 @@ class HotCatchAppsController < ApplicationController
   before_action -> {redirect_if_not_one_of_role_in ["admin"]}
 
   def show_nginx_statistic
-    o_file = "log/apps/#{@hot_catch_app.name.downcase}-report.html"
-    if File.exist? o_file
-      render file: o_file, layout: true
-    else
-      flash[:danger] = "Статистика не найдена"
-      redirect_to hot_catch_app_path(@hot_catch_app)
-    end
+    @data = JSON.parse(File.open('log/apps/dummy-report2.json', 'r'){|file| file.read})
+    @general = @data["general"]
+    @visitors = @data["visitors"]
+    @requests = @data["requests"]
+    @static_requests = @data["static_requests"]
+    @hosts = @data["hosts"]
+    @os = @data["os"]
+    @browsers = @data["browsers"]
+    @visit_time = @data["visit_time"]
+    @status_codes = @data["status_codes"]
+    @geolocation = @data["geolocation"]
   end
 
   def show_server_statistic
