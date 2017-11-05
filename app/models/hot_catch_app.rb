@@ -1,5 +1,7 @@
 class HotCatchApp < ApplicationRecord
   has_many :main_hot_catch_logs
+  has_many :disks
+  has_many :system_metrics
 
   self.per_page = 10 # пагинация
 

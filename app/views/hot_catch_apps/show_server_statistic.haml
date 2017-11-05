@@ -1,4 +1,61 @@
 .row
   .filter-container
-    =link_to "Назад", hot_catch_app_path(@hot_catch_app)
-    %pre= @server_logs
+    -# =link_to "Назад", hot_catch_app_path(@hot_catch_app)
+    -# %pre= @server_logs
+    -#
+    -# - for metric in @hot_catch_app.system_metrics do
+    -#   = l metric.get_time
+    -#   %br
+    -#   = metric.cpu_average_minute
+    -#   %br
+    -#   - for network in metric.networks do
+    -#     = network.name
+    -#     %br
+    -#     = network.bytes_in
+    -#     %br
+    -#   %hr
+    - for disk in @disks do
+      = disk.name
+      %br
+      = disk.mounted_on
+      %br
+
+    %table.table
+      %tr
+        %td= t("metrics.date")
+      %tr
+        %td= t("metrics.time")
+      %tr
+        %td= t("metrics.cpu_average_minute")
+      %tr
+        %td= t("metrics.memory_size")
+      %tr
+        %td= t("metrics.memory_used")
+      %tr
+        %td= t("metrics.swap_size")
+      %tr
+        %td= t("metrics.swap_used")
+      %tr
+        %td= t("metrics.discriptors_max")
+      %tr
+        %td= t("metrics.descriptors_used")
+      %tr
+        %td= t("metrics.name_disk")
+      %tr
+        %td= t("metrics.filesystem")
+      %tr
+        %td= t("metrics.disk_size")
+      %tr
+        %td= t("metrics.disk_used")
+      %tr
+        %td= t("metrics.mounted_on")
+      %tr
+        %td= t("metrics.name_network")
+      %tr
+        %td= t("metrics.bytes_in")
+      %tr
+        %td= t("metrics.bytes_out")
+      %tr
+        %td= t("metrics.packets_in")
+      %tr
+        %td= t("metrics.packets_out")

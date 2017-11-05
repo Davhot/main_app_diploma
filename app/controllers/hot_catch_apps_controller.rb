@@ -26,13 +26,12 @@ class HotCatchAppsController < ApplicationController
   end
 
   def show_server_statistic
-    o_file = "log/apps/#{@hot_catch_app.name.downcase}-system.txt"
-    unless File.exist? o_file
+    if @hot_catch_app.system_metrics.blank?
       flash[:danger] = "Статистика не найдена"
       redirect_to hot_catch_apps_path
     else
-      @server_logs = ""
-      File.open(o_file, 'r'){|file| @server_logs = file.read}
+      @metrics = @hot_catch_app.system_metrics
+      @disks = @hot_catch_app.disks
     end
   end
 

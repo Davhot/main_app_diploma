@@ -30,10 +30,46 @@ class MainHotCatchLog < ApplicationRecord
   end
 
   def process_system_logs(logs)
+    metric = SystemMetric.create(cpu_average_minute: logs["cpu"]["last_minute"],
+      memory_size: logs["memory"]["size"], memory_used: logs["memory"]["used"],
+      swap_size: logs["memory"]["swap_size"], swap_used: logs["memory"]["swap_used"],
+      discriptors_max: logs["descriptors"]["max"],
+      descriptors_used: logs["descriptors"]["current"],
+      get_time: logs["time"],
+      hot_catch_app_id: hot_catch_app.id)
+
+    # Обновляем/создаём диски
+    disks = []
+    logs["disk"].each do |k, v|
+      disks << Disk.find_or_create_by(name: k)
+      if disks[-1].present?
+        disks[-1].update_attributes({
+          filesystem: v["filesystem"],
+          size: v["size"],
+          used: v["used"],
+          mounted_on: v["mounted_on\n"].strip,
+          hot_catch_app_id: hot_catch_app.id})
+      end
+    end
+    # Удаляем ненужные
+    for disk_name in hot_catch_app.disks.pluck(:name) - disks.map{|d| d.name} do
+      Disk.find_by(name: disk_name, hot_catch_app_id: hot_catch_app.id).destroy
+    end
+
+    logs["network"].each do |k, v|
+      network = Network.create(name: k,
+        bytes_in: v["bytes_in"],
+        bytes_out: v["bytes_out"],
+        packets_in: v["packets_in"],
+        packets_out: v["packets_out"],
+        system_metric_id: metric.id)
+    end
+
     o_file = "log/apps/#{hot_catch_app.name.downcase}-system.txt"
     file = File.open(o_file, 'w')
 
-    # file.puts "#{logs}\n\n"
+    file.puts
+    File.open("log/apps/system.json", 'w'){|file| file.puts logs}
 
     logs.each do |key, val|
       if key != "time"
@@ -76,7 +112,8 @@ class MainHotCatchLog < ApplicationRecord
       self.status = parser.get_status(self.log_data, self.status)
       str2 = parser.strip_str(str)
       # Если есть лог, то count_log += 1
-      MainHotCatchLog.where(status: status, hot_catch_app_id: hot_catch_app.id).each do |cur_log|
+      MainHotCatchLog.where(status: status,
+      hot_catch_app_id: hot_catch_app.id).each do |cur_log|
         if parser.strip_str(cur_log.log_data) == str2
           cur_log.user_requests << req if req.present?
           cur_log.update_attribute(:count_log, cur_log.count_log + 1)
