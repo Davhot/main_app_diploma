@@ -1,0 +1,48 @@
+%table.hidden#metrics-orig
+  %tr
+    %td= t("metrics.date")
+    - for metric in @metrics do
+      %td= l metric.get_time, format: :date
+  %tr
+    %td= t("metrics.time")
+    - for metric in @metrics do
+      %td= l metric.get_time, format: :time
+  %tr
+    %td= t("metrics.cpu_average_minute")
+    - for metric in @metrics do
+      %td= metric.cpu_average_minute_in_percent
+  %tr
+    %td= t("metrics.memory_used") + " (доступно #{number_to_human_size(@main_metric.memory_size * 2 ** 20)})"
+    - for metric in @metrics do
+      %td= number_to_human_size(metric.memory_used * 2 ** 20)
+  %tr
+    %td= t("metrics.swap_used") + " (доступно #{number_to_human_size(@main_metric.swap_size * 2 ** 20)})"
+    - for metric in @metrics do
+      %td= number_to_human_size(metric.swap_used * 2 ** 20)
+  %tr
+    %td= t("metrics.descriptors_used") + " (максимум #{@main_metric.descriptors_max})"
+    - for metric in @metrics do
+      %td= metric.descriptors_used
+
+- for one_type_network in @networks do
+  %table.table.hidden{id: "network-table-orig-#{one_type_network.first.name}"}
+    %tr
+      %td= t("metrics.date")
+      - for network in one_type_network do
+        %td= l network.get_time, format: :date
+    %tr
+      %td= t("metrics.time")
+      - for network in one_type_network do
+        %td= l network.get_time, format: :time
+    %tr
+      %td= t("metrics.name_network")
+      - for network in one_type_network do
+        %td= network.name
+    %tr
+      %td= t("metrics.bytes_in")
+      - for network in one_type_network do
+        %td= number_to_human_size(network.bytes_in * 2 ** 10)
+    %tr
+      %td= t("metrics.bytes_out")
+      - for network in one_type_network do
+        %td= number_to_human_size(network.bytes_out * 2 ** 10)

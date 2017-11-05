@@ -1,3 +1,3 @@
 class Network < ApplicationRecord
-  belongs_to :system_metric
+  belongs_to :hot_catch_app
 end

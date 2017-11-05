@@ -19,6 +19,8 @@ ru:
   time:
     formats:
       default: "%d.%m.%Y %H:%M:%S"
+      date: "%d.%m.%Y"
+      time: "%H:%M:%S"
   metrics:
     date: Дата
     time: Время
@@ -27,12 +29,12 @@ ru:
     memory_used: Использование оперативной памяти
     swap_size: Доступный размер файла подкачки
     swap_used: Использование файла подкачки
-    discriptors_max: Максимальное количество доступных дескрипторов
+    descriptors_max: Максимальное количество доступных дескрипторов
     descriptors_used: Количество открытых дескрипторов
-    name_disk: Название раздела жёсткого диского
-    filesystem: Файловая система жёсткого диска
-    disk_size: Размер жёсткого диска
-    disk_used: Используемый объём жёсткого диска
+    name_disk: Раздел
+    filesystem: Файловая система
+    disk_size: Размер
+    disk_used: Используемый объём
     mounted_on: Подключён к разделу
     name_network: Интерфейс
     bytes_in: Входящий трафик

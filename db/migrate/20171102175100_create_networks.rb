@@ -6,7 +6,8 @@ class CreateNetworks < ActiveRecord::Migration[5.0]
       t.float :bytes_out
       t.float :packets_in
       t.float :packets_out
-      t.references :system_metric, foreign_key: true
+      t.datetime :get_time
+      t.references :hot_catch_app, index: true, foreign_key: true
 
       t.timestamps
     end

@@ -1,4 +1,13 @@
 FactoryGirl.define do
+  factory :main_metric do
+    memory_size 1
+    swap_size 1
+    descriptors_max 1
+    architecture "MyString"
+    os "MyString"
+    os_version "MyString"
+    host_name "MyString"
+  end
   factory :network do
     bytes_in 1.5
     bytes_out 1.5

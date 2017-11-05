@@ -31,12 +31,26 @@ class MainHotCatchLog < ApplicationRecord
 
   def process_system_logs(logs)
     metric = SystemMetric.create(cpu_average_minute: logs["cpu"]["last_minute"],
-      memory_size: logs["memory"]["size"], memory_used: logs["memory"]["used"],
-      swap_size: logs["memory"]["swap_size"], swap_used: logs["memory"]["swap_used"],
-      discriptors_max: logs["descriptors"]["max"],
-      descriptors_used: logs["descriptors"]["current"],
-      get_time: logs["time"],
+      memory_used: logs["memory"]["used"], swap_used: logs["memory"]["swap_used"],
+      descriptors_used: logs["descriptors"]["current"], get_time: logs["time"],
       hot_catch_app_id: hot_catch_app.id)
+
+    main_metric_attrs = {
+      memory_size: logs["memory"]["size"],
+      swap_size: logs["memory"]["swap_size"],
+      descriptors_max: logs["descriptors"]["max"],
+      architecture: logs["system_info"]["architecture"],
+      os: logs["system_info"]["os"],
+      os_version: logs["system_info"]["os_version"],
+      host_name: logs["system_info"]["host_name"]
+    }
+    if hot_catch_app.main_metric.present?
+      hot_catch_app.main_metric.update_attributes(main_metric_attrs)
+    else
+      main_metric = MainMetric.new(main_metric_attrs)
+      main_metric.hot_catch_app = hot_catch_app
+      main_metric.save
+    end
 
     # Обновляем/создаём диски
     disks = []
@@ -56,13 +70,19 @@ class MainHotCatchLog < ApplicationRecord
       Disk.find_by(name: disk_name, hot_catch_app_id: hot_catch_app.id).destroy
     end
 
+    networks = []
     logs["network"].each do |k, v|
-      network = Network.create(name: k,
+      networks << k
+      Network.create(name: k,
         bytes_in: v["bytes_in"],
         bytes_out: v["bytes_out"],
         packets_in: v["packets_in"],
         packets_out: v["packets_out"],
-        system_metric_id: metric.id)
+        get_time: logs["time"],
+        hot_catch_app_id: hot_catch_app.id)
+    end
+    for interface in (hot_catch_app.networks.pluck(:name) - networks) do
+      Network.where(name: interface, hot_catch_app_id: hot_catch_app.id).delete_all
     end
 
     o_file = "log/apps/#{hot_catch_app.name.downcase}-system.txt"

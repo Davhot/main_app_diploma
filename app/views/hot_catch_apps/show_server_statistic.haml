@@ -1,61 +1,84 @@
+= render 'original_tables'
 .row
   .filter-container
-    -# =link_to "Назад", hot_catch_app_path(@hot_catch_app)
-    -# %pre= @server_logs
-    -#
-    -# - for metric in @hot_catch_app.system_metrics do
-    -#   = l metric.get_time
-    -#   %br
-    -#   = metric.cpu_average_minute
-    -#   %br
-    -#   - for network in metric.networks do
-    -#     = network.name
-    -#     %br
-    -#     = network.bytes_in
-    -#     %br
-    -#   %hr
-    - for disk in @disks do
-      = disk.name
-      %br
-      = disk.mounted_on
-      %br
-
     %table.table
       %tr
-        %td= t("metrics.date")
-      %tr
-        %td= t("metrics.time")
-      %tr
-        %td= t("metrics.cpu_average_minute")
-      %tr
-        %td= t("metrics.memory_size")
-      %tr
-        %td= t("metrics.memory_used")
-      %tr
-        %td= t("metrics.swap_size")
-      %tr
-        %td= t("metrics.swap_used")
-      %tr
-        %td= t("metrics.discriptors_max")
-      %tr
-        %td= t("metrics.descriptors_used")
-      %tr
         %td= t("metrics.name_disk")
+        - for disk in @disks do
+          %td= disk.name
       %tr
         %td= t("metrics.filesystem")
+        - for disk in @disks do
+          %td= disk.filesystem
       %tr
         %td= t("metrics.disk_size")
+        - for disk in @disks do
+          %td= number_to_human_size(disk.size * 2 ** 20)
       %tr
         %td= t("metrics.disk_used")
+        - for disk in @disks do
+          %td= number_to_human_size(disk.used * 2 ** 20)
       %tr
         %td= t("metrics.mounted_on")
+        - for disk in @disks do
+          %td= disk.mounted_on
+
+    %table.table#metrics-show
       %tr
-        %td= t("metrics.name_network")
+        %td= t("metrics.date")
+        - for metric in @n_metrics do
+          %td
       %tr
-        %td= t("metrics.bytes_in")
+        %td= t("metrics.time")
+        - for metric in @n_metrics do
+          %td
       %tr
-        %td= t("metrics.bytes_out")
+        %td= t("metrics.cpu_average_minute")
+        - for metric in @n_metrics do
+          %td
       %tr
-        %td= t("metrics.packets_in")
+        %td= t("metrics.memory_used") + " (доступно #{number_to_human_size(@main_metric.memory_size * 2 ** 20)})"
+        - for metric in @n_metrics do
+          %td
       %tr
-        %td= t("metrics.packets_out")
+        %td= t("metrics.swap_used") + " (доступно #{number_to_human_size(@main_metric.swap_size * 2 ** 20)})"
+        - for metric in @n_metrics do
+          %td
+      %tr
+        %td= t("metrics.descriptors_used") + " (максимум #{@main_metric.descriptors_max})"
+        - for metric in @n_metrics do
+          %td
+    %p
+      %label Столбцы:
+      %input{type: "text", class:"amount", readonly:true, style:"border:0; color:#f6931f; font-weight:bold;"}
+    .slider{data: {"orig-table": "#metrics-orig", "show-table": "#metrics-show",
+      "start-n-elements": "#{@n_metrics.size}"}}
+
+    - for one_type_network in @n_networks do
+      %table.table{id: "network-table-show-#{one_type_network.first.name}"}
+        %tr
+          %td= t("metrics.date")
+          - for network in one_type_network do
+            %td= l network.get_time, format: :date
+        %tr
+          %td= t("metrics.time")
+          - for network in one_type_network do
+            %td= l network.get_time, format: :time
+        %tr
+          %td= t("metrics.name_network")
+          - for network in one_type_network do
+            %td= network.name
+        %tr
+          %td= t("metrics.bytes_in")
+          - for network in one_type_network do
+            %td= number_to_human_size(network.bytes_in * 2 ** 10)
+        %tr
+          %td= t("metrics.bytes_out")
+          - for network in one_type_network do
+            %td= number_to_human_size(network.bytes_out * 2 ** 10)
+      %p
+        %label Столбцы:
+        %input{type: "text", class:"amount", readonly:true, style:"border:0; color:#f6931f; font-weight:bold;"}
+      .slider{data: {"orig-table": "#network-table-orig-#{one_type_network.first.name}",
+        "show-table": "#network-table-show-#{one_type_network.first.name}",
+        "start-n-elements": "#{one_type_network.size}"}}

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171102175100) do
+ActiveRecord::Schema.define(version: 20171105182737) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -44,16 +44,31 @@ ActiveRecord::Schema.define(version: 20171102175100) do
     t.index ["hot_catch_app_id"], name: "index_main_hot_catch_logs_on_hot_catch_app_id", using: :btree
   end
 
+  create_table "main_metrics", force: :cascade do |t|
+    t.integer  "memory_size"
+    t.integer  "swap_size"
+    t.integer  "descriptors_max"
+    t.string   "architecture"
+    t.string   "os"
+    t.string   "os_version"
+    t.string   "host_name"
+    t.integer  "hot_catch_app_id"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+    t.index ["hot_catch_app_id"], name: "index_main_metrics_on_hot_catch_app_id", using: :btree
+  end
+
   create_table "networks", force: :cascade do |t|
     t.string   "name"
     t.float    "bytes_in"
     t.float    "bytes_out"
     t.float    "packets_in"
     t.float    "packets_out"
-    t.integer  "system_metric_id"
+    t.datetime "get_time"
+    t.integer  "hot_catch_app_id"
     t.datetime "created_at",       null: false
     t.datetime "updated_at",       null: false
-    t.index ["system_metric_id"], name: "index_networks_on_system_metric_id", using: :btree
+    t.index ["hot_catch_app_id"], name: "index_networks_on_hot_catch_app_id", using: :btree
   end
 
   create_table "role_users", force: :cascade do |t|
@@ -78,11 +93,8 @@ ActiveRecord::Schema.define(version: 20171102175100) do
 
   create_table "system_metrics", force: :cascade do |t|
     t.float    "cpu_average_minute"
-    t.integer  "memory_size"
     t.integer  "memory_used"
-    t.integer  "swap_size"
     t.integer  "swap_used"
-    t.integer  "discriptors_max"
     t.integer  "descriptors_used"
     t.datetime "get_time"
     t.integer  "hot_catch_app_id"
@@ -115,7 +127,8 @@ ActiveRecord::Schema.define(version: 20171102175100) do
 
   add_foreign_key "disks", "hot_catch_apps"
   add_foreign_key "main_hot_catch_logs", "hot_catch_apps"
-  add_foreign_key "networks", "system_metrics"
+  add_foreign_key "main_metrics", "hot_catch_apps"
+  add_foreign_key "networks", "hot_catch_apps"
   add_foreign_key "role_users", "roles"
   add_foreign_key "role_users", "users"
   add_foreign_key "system_metrics", "hot_catch_apps"

@@ -30,8 +30,18 @@ class HotCatchAppsController < ApplicationController
       flash[:danger] = "Статистика не найдена"
       redirect_to hot_catch_apps_path
     else
-      @metrics = @hot_catch_app.system_metrics
+      @main_metric = @hot_catch_app.main_metric
+      @metrics = @hot_catch_app.system_metrics.order(:get_time).last(100)
       @disks = @hot_catch_app.disks
+
+      @networks = []
+      for name in @hot_catch_app.network_interfaces do
+        @networks << @hot_catch_app.networks.where(name: name).last(150)
+      end
+
+      @n_metrics = @metrics.last(4)
+
+      @n_networks = @networks.map{|network| network.last(5)}
     end
   end
 
