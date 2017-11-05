@@ -17,3 +17,5 @@
   "from_log":"Rails",
   "status":"500"}
 }`
+
+### Версия GoAccess - 1.2.
