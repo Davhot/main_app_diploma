@@ -2,6 +2,7 @@ apps_functions = ->
   link_app()
   toggle_errors()
   toggle_links_stat()
+  $(".truncated-td").attr("title", $(".truncated-td").text())
   # $('#myModal').modal()
 
 $(document).on 'turbolinks:load', apps_functions

@@ -35,10 +35,6 @@
       - for network in one_type_network do
         %td= l network.get_time, format: :time
     %tr
-      %td= t("metrics.name_network")
-      - for network in one_type_network do
-        %td= network.name
-    %tr
       %td= t("metrics.bytes_in")
       - for network in one_type_network do
         %td= number_to_human_size(network.bytes_in * 2 ** 10)

@@ -4,6 +4,8 @@ ru:
       header_index: Приложения
       header_show: Ошибки приложения
       nginx: Статистика Nginx
+      server_statistic: Нагрузка на систему
+
   will_paginate:
     previous_label: "←"
     next_label: "→"

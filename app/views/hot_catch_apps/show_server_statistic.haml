@@ -1,84 +1,104 @@
+-provide(:title, t('app.apps.server_statistic'))
+=breadcrumb_tag do
+  %li.active= t('app.apps.server_statistic')
+  %li= link_to t('app.apps.header_index'), hot_catch_apps_path
+
 = render 'original_tables'
 .row
   .filter-container
-    %table.table
-      %tr
-        %td= t("metrics.name_disk")
-        - for disk in @disks do
-          %td= disk.name
-      %tr
-        %td= t("metrics.filesystem")
-        - for disk in @disks do
-          %td= disk.filesystem
-      %tr
-        %td= t("metrics.disk_size")
-        - for disk in @disks do
-          %td= number_to_human_size(disk.size * 2 ** 20)
-      %tr
-        %td= t("metrics.disk_used")
-        - for disk in @disks do
-          %td= number_to_human_size(disk.used * 2 ** 20)
-      %tr
-        %td= t("metrics.mounted_on")
-        - for disk in @disks do
-          %td= disk.mounted_on
+    .nginx-logs
+      .row
+        .col-xs-12
+          %h1= "Нагрузка на систему приложения #{@hot_catch_app.name}"
+          %hr.hr5
+      .row
+        .col-md-12
+          .nginx-block
+            .nginx-header Диски
+            %table.table
+              %tr
+                %td= t("metrics.name_disk")
+                - for disk in @disks do
+                  %td= disk.name
+              %tr
+                %td= t("metrics.filesystem")
+                - for disk in @disks do
+                  %td= disk.filesystem
+              %tr
+                %td= t("metrics.disk_size")
+                - for disk in @disks do
+                  %td= number_to_human_size(disk.size * 2 ** 20)
+              %tr
+                %td= t("metrics.disk_used")
+                - for disk in @disks do
+                  %td= number_to_human_size(disk.used * 2 ** 20)
+              %tr
+                %td= t("metrics.mounted_on")
+                - for disk in @disks do
+                  %td= disk.mounted_on
 
-    %table.table#metrics-show
-      %tr
-        %td= t("metrics.date")
-        - for metric in @n_metrics do
-          %td
-      %tr
-        %td= t("metrics.time")
-        - for metric in @n_metrics do
-          %td
-      %tr
-        %td= t("metrics.cpu_average_minute")
-        - for metric in @n_metrics do
-          %td
-      %tr
-        %td= t("metrics.memory_used") + " (доступно #{number_to_human_size(@main_metric.memory_size * 2 ** 20)})"
-        - for metric in @n_metrics do
-          %td
-      %tr
-        %td= t("metrics.swap_used") + " (доступно #{number_to_human_size(@main_metric.swap_size * 2 ** 20)})"
-        - for metric in @n_metrics do
-          %td
-      %tr
-        %td= t("metrics.descriptors_used") + " (максимум #{@main_metric.descriptors_max})"
-        - for metric in @n_metrics do
-          %td
-    %p
-      %label Столбцы:
-      %input{type: "text", class:"amount", readonly:true, style:"border:0; color:#f6931f; font-weight:bold;"}
-    .slider{data: {"orig-table": "#metrics-orig", "show-table": "#metrics-show",
-      "start-n-elements": "#{@n_metrics.size}"}}
-
-    - for one_type_network in @n_networks do
-      %table.table{id: "network-table-show-#{one_type_network.first.name}"}
-        %tr
-          %td= t("metrics.date")
-          - for network in one_type_network do
-            %td= l network.get_time, format: :date
-        %tr
-          %td= t("metrics.time")
-          - for network in one_type_network do
-            %td= l network.get_time, format: :time
-        %tr
-          %td= t("metrics.name_network")
-          - for network in one_type_network do
-            %td= network.name
-        %tr
-          %td= t("metrics.bytes_in")
-          - for network in one_type_network do
-            %td= number_to_human_size(network.bytes_in * 2 ** 10)
-        %tr
-          %td= t("metrics.bytes_out")
-          - for network in one_type_network do
-            %td= number_to_human_size(network.bytes_out * 2 ** 10)
-      %p
-        %label Столбцы:
-        %input{type: "text", class:"amount", readonly:true, style:"border:0; color:#f6931f; font-weight:bold;"}
-      .slider{data: {"orig-table": "#network-table-orig-#{one_type_network.first.name}",
-        "show-table": "#network-table-show-#{one_type_network.first.name}",
-        "start-n-elements": "#{one_type_network.size}"}}
+      .row
+        .col-md-12
+          .nginx-block
+            .nginx-header Нагрузка на систему
+            %table.table#metrics-show
+              %tr
+                %td= t("metrics.date")
+                - for metric in @n_metrics do
+                  %td
+              %tr
+                %td= t("metrics.time")
+                - for metric in @n_metrics do
+                  %td
+              %tr
+                %td= t("metrics.cpu_average_minute")
+                - for metric in @n_metrics do
+                  %td
+              %tr
+                %td= t("metrics.memory_used") + " (доступно #{number_to_human_size(@main_metric.memory_size * 2 ** 20)})"
+                - for metric in @n_metrics do
+                  %td
+              %tr
+                %td= t("metrics.swap_used") + " (доступно #{number_to_human_size(@main_metric.swap_size * 2 ** 20)})"
+                - for metric in @n_metrics do
+                  %td
+              %tr
+                %td= t("metrics.descriptors_used") + " (максимум #{@main_metric.descriptors_max})"
+                - for metric in @n_metrics do
+                  %td
+            %p
+              %label Столбцы:
+              %input{type: "text", class:"amount", readonly:true, style:"border:0; color:#f6931f; font-weight:bold;"}
+            .slider{data: {"orig-table": "#metrics-orig", "show-table": "#metrics-show",
+              "start-n-elements": "#{@n_metrics.size}"}}
+            %br
+      %br
+      .row
+        .col-md-12
+          .nginx-block
+            - for one_type_network in @n_networks do
+              .nginx-header= t("metrics.name_network") + ": " + one_type_network.last.name
+              %table.table{id: "network-table-show-#{one_type_network.first.name}"}
+                %tr
+                  %td= t("metrics.date")
+                  - for network in one_type_network do
+                    %td= l network.get_time, format: :date
+                %tr
+                  %td= t("metrics.time")
+                  - for network in one_type_network do
+                    %td= l network.get_time, format: :time
+                %tr
+                  %td= t("metrics.bytes_in")
+                  - for network in one_type_network do
+                    %td= number_to_human_size(network.bytes_in * 2 ** 10)
+                %tr
+                  %td= t("metrics.bytes_out")
+                  - for network in one_type_network do
+                    %td= number_to_human_size(network.bytes_out * 2 ** 10)
+              %p
+                %label Столбцы:
+                %input{type: "text", class:"amount", readonly:true, style:"border:0; color:#f6931f; font-weight:bold;"}
+              .slider{data: {"orig-table": "#network-table-orig-#{one_type_network.first.name}",
+                "show-table": "#network-table-show-#{one_type_network.first.name}",
+                "start-n-elements": "#{one_type_network.size}"}}
+              %br
