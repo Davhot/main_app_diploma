@@ -12,5 +12,6 @@
  *
  *= require theme
  *= require jquery-ui.min
+ *= require c3.min
  *= require_self
  */

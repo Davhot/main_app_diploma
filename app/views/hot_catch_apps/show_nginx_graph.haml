@@ -1,0 +1,35 @@
+-provide(:title, t('app.apps.nginx.headers.graphic'))
+=breadcrumb_tag do
+  %li.active= t('app.apps.nginx.headers.graphic')
+  %li= link_to t('app.apps.nginx.headers.index'), show_nginx_statistic_hot_catch_app_path(@hot_catch_app)
+  %li= link_to t('app.apps.header_index'), hot_catch_apps_path
+
+.row
+  .filter-container
+    .nginx-logs
+      = form_tag load_nginx_graph_hot_catch_app_url(@hot_catch_app), class: "nginx-form-filter" do
+        .row
+          .col-md-12
+            %fieldset
+              %legend.header= I18n.t("datetime_fields_label", scope: "nginx_graph_form_step")
+            .flex-items
+              - for type in ["year", "month", "day", "hour", "minute"] do
+                %p
+                  = radio_button_tag :nginx_graph_form_step, type, (type == "hour"), class: 'nginx-form-filter-field'
+                  = label_tag ("nginx_graph_form_step_" + type), I18n.t(type, scope: "nginx_graph_form_step")
+
+      #nginx-chart
+        = render 'spinner'
+
+.modal.fade.bs-example-modal-lg#modal-nginx-logs{tabindex: "-1", role: "dialog", "aria-labelledby": "myLargeModalLabel"}
+  .modal-dialog.modal-lg{role: "document"}
+    .modal-content
+      .modal-header
+        %button.close{type: "button", "data-dismiss": "modal", "aria-label": "Close"}
+          %span{"aria-hidden": "true"} &times;
+        %h4.modal-title Данные Nginx
+      .modal-body
+        %pre#modal-nginx-logs-body
+          = render 'spinner'
+      .modal-footer
+        %button.btn.btn-default{type: "button", "data-dismiss": "modal"} Закрыть

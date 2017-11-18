@@ -1,9 +1,21 @@
 ru:
+  nginx_graph_form_step:
+    datetime_fields_label: Отобразить график с шагом
+    year: Год
+    month: Месяц
+    day: День
+    hour: Час
+    minute: Минута
+
   app:
     apps:
       header_index: Приложения
       header_show: Ошибки приложения
-      nginx: Статистика Nginx
+      nginx:
+        headers:
+          index: Статистика Nginx
+          graphic: Инфографика
+
       server_statistic: Нагрузка на систему
 
   will_paginate:

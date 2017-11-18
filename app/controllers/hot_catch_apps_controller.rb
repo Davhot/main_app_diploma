@@ -1,8 +1,42 @@
 class HotCatchAppsController < ApplicationController
-  before_action :set_hot_catch_app, only: [:show, :edit, :update, :destroy,
-    :show_nginx_statistic, :show_server_statistic]
+  before_action :set_hot_catch_app, except: [:index]
 
   before_action -> {redirect_if_not_one_of_role_in ["admin"]}
+
+  include FormatDates
+  # Ajax получение данных лога по клику на точку графика
+  def nginx_logs
+    parser = ParseNginx.new
+    if params["nginx-date"].present?
+      parser.parse_file_for_date("log/apps/#{@hot_catch_app.name.downcase}-nginx.access.log", params["nginx-date"])
+      render :json => { :status => true, :nginx_logs => parser.data.map{|x| {log: x}} }
+    else
+      render :json => { :status => true, :nginx_logs => {log: "Нет данных"} }
+    end
+  end
+
+  # Ajax подгрузка графика
+  def load_nginx_graph
+    parser = ParseNginx.new
+    parser.parse_all_data("log/apps/#{@hot_catch_app.name.downcase}-nginx.access.log")
+    @data = parser.data
+    @nginx_logs_path = nginx_logs_hot_catch_app_url(@hot_catch_app)
+    @nginx_graph_form_step = params["nginx_graph_form_step"].present? ? params["nginx_graph_form_step"] : "hour"
+
+    @moment_format = format_moment(@nginx_graph_form_step)
+    @parse_c3_date_format = format_c3_date(@nginx_graph_form_step)
+    @show_datetime_format = format_show_datetime(@nginx_graph_form_step)
+
+    @graphic_stats = @data.map{|x| x[1].strftime(@parse_c3_date_format)}.group_by{|e| e}.map{|k, v| [k, v.length]}
+    @graph_data_x = @graphic_stats.map{|x| x[0]}
+    @graph_data_y = @graphic_stats.map{|x| x[1]}
+
+    render :load_nginx_graph, :layout => false
+  end
+
+  def show_nginx_graph
+    gon.nginx_load_graph_path = load_nginx_graph_hot_catch_app_url(@hot_catch_app)
+  end
 
   def show_nginx_statistic
     o_file = "log/apps/#{@hot_catch_app.name.downcase}-report.json"

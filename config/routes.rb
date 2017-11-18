@@ -4,8 +4,11 @@ Rails.application.routes.draw do
   resources :users
   resources :hot_catch_apps do
     member do
+      get 'show_nginx_graph', to: "hot_catch_apps#show_nginx_graph"
       get 'show_nginx_statistic', to: "hot_catch_apps#show_nginx_statistic"
       get 'show_server_statistic', to: "hot_catch_apps#show_server_statistic"
+      get 'nginx_logs', to: "hot_catch_apps#nginx_logs"
+      get 'load_nginx_graph', to: "hot_catch_apps#load_nginx_graph"
     end
   end
 

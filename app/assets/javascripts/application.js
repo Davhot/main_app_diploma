@@ -15,4 +15,7 @@
 //= require turbolinks
 //= require bootstrap
 //= require bootstrap-growl.min
+//= require moment
+//= require d3.v3.min
+//= require c3.min
 //= require_tree .

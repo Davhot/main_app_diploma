@@ -4,6 +4,9 @@ require 'rails/all'
 require './lib/form_builder.rb'
 
 require './lib/rails_log_parser'
+require './lib/parse_nginx'
+require './lib/format'
+
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
