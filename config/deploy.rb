@@ -1,5 +1,5 @@
 # config valid only for current version of Capistrano
-lock "3.9.0"
+# lock "3.9.0"
 
 # ИЗМЕНИТЬ ПОД СЕБЯ
 server '192.168.111.115', roles: [:web, :app, :db], primary: true
