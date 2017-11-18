@@ -9,4 +9,4 @@ ready = ->
       $.growl $(this).html(),
         type: type
 
-$(document).on 'turbolinks:load', ready
+$ -> ready()

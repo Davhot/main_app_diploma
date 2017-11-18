@@ -13,6 +13,6 @@
     .collapse.nav.navbar-collapse.navbar-right#bs-example-navbar-collapse-1
       #lk
         - if current_user
-          = link_to "Выход", :logout, method: :post
+          = link_to "Выход", :logout
         - else
           = link_to "Вход", :login

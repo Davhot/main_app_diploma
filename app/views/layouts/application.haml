@@ -5,8 +5,8 @@
     %meta{charset: 'utf-8'}
     %meta{name: 'viewport', content: "width=device-width, initial-scale=1.0"}
     %meta{'http-equiv'=>"X-UA-Compatible", 'content'=>"IE=edge"}
-    = stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true
-    = javascript_include_tag 'application', 'data-turbolinks-track' => true
+    = stylesheet_link_tag    'application', media: 'all'
+    = javascript_include_tag 'application'
     = csrf_meta_tags
     = favicon_link_tag 'favicon.ico'
     = favicon_link_tag 'favicon-32x32.png', sizes: '32x32'
@@ -29,8 +29,5 @@
             -if content_for? :error_messages
               =yield :error_messages
             = yield
-  -# .modal.fade#loader{tabindex: -1, role: 'dialog', 'aria-labelledby' => 'myModalLabel'}
-  -#   .modal-dialog.mymodal{role: 'document'}
-  -#     =image_tag 'gears.gif'
 
   =render 'footer'

@@ -8,8 +8,6 @@ togglef = ->
     $(this).parent().children(".subitems").toggle(300)
     false
 
-$(document).on 'turbolinks:load', ready
-# $(document).ready ready
-
-$(document).on 'turbolinks:load', togglef
-# $(document).ready togglef
+$ ->
+  ready()
+  togglef()

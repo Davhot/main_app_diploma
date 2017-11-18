@@ -15,4 +15,4 @@ nginx_graphic = ->
       alert("Данные не отправлены")
     )
 
-$(document).on 'turbolinks:load', nginx_graphic
+$ -> nginx_graphic()
