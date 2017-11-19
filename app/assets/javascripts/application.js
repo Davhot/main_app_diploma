@@ -15,6 +15,8 @@
 //= require bootstrap
 //= require bootstrap-growl.min
 //= require moment
+//= require bootstrap-datetimepicker
+//= require moment/ru
 //= require d3.v3.min
 //= require c3.min
 //= require_tree .

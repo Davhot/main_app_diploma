@@ -1,8 +1,22 @@
 var chart;
 
-<% if @graph_data_x.count > 0 %>
+<% if @error_date %>
+  alert("Неверный формат даты")
+<% elsif @graph_data_x.count > 0 %>
+  $("#nginx_graph_form_from").val("<%= @begin_date %>")
+  $("#nginx_graph_form_to").val("<%= @end_date %>")
+  $("#limit-date").text("(<%= @min_date %> - <%= @max_date %>)")
+
+  $("#nginx_graph_form_ip").html("")
+  <% for ip in @ips do %>
+    $("#nginx_graph_form_ip").append("<option <%= 'selected' if @cur_ip == ip %> value='<%= ip %>'><%= ip %></option>")
+  <% end %>
+  $("#nginx_graph_form_visitor").html("")
+  <% for visitor in @visitors do %>
+    $("#nginx_graph_form_visitor").append("<option <%= 'selected' if @cur_visitor == visitor[1] %> value='<%= visitor[1] %>'><%= visitor[0] %></option>")
+  <% end %>
+
   <% @graph_data_x.unshift('x'); @graph_data_y.unshift('Nginx') %>
-  // console.log(<%== @graph_data_x %>)
   chart = c3.generate({
     point: {
       r: 5
@@ -15,7 +29,7 @@ var chart;
       onclick: function(d, element) {
         var find_date;
         $("#modal-nginx-logs").modal('show');
-        find_date = moment(d.x).format('<%== @moment_format %>');
+        find_date = moment(d.x).lang("en").format('<%== @moment_format %>');
         return $.ajax({
           url: '<%= @nginx_logs_path %>' + "?nginx-date=" + find_date
         }).done(function(data) {
@@ -54,4 +68,5 @@ var chart;
       hide: 'Nginx'
     }
   });
+
 <% end %>

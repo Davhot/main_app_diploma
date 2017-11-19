@@ -44,4 +44,8 @@ module FormatDates
       '%Y'
     end
   end
+
+  def format_nginx_datetime
+    "%d/%b/%Y:%H:%M"
+  end
 end

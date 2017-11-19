@@ -20,6 +20,30 @@ class HotCatchAppsController < ApplicationController
     parser = ParseNginx.new
     parser.parse_all_data("log/apps/#{@hot_catch_app.name.downcase}-nginx.access.log")
     @data = parser.data
+    @ips = @data.map{|x| x[0]}.uniq
+    @visitors = @data.map{|x| [x[0], "#{x[0]}|#{x[2]}"]}.uniq
+    if params["nginx_graph_form_type"].present?
+      @cur_ip = params["nginx_graph_form_ip"] if params["nginx_graph_form_ip"].present?
+      @cur_visitor = params["nginx_graph_form_visitor"] if params["nginx_graph_form_visitor"].present?
+      if params["nginx_graph_form_type"] == "ip" && params["nginx_graph_form_ip"].present?
+        @data = @data.select{|x| x[0] == params["nginx_graph_form_ip"]}
+      elsif params["nginx_graph_form_type"] == "visitor" && params["nginx_graph_form_visitor"].present?
+        ip, visitor_info = params["nginx_graph_form_visitor"].split("|")
+        @data = @data.select{|x| x[0] == ip && x[2] == visitor_info}
+      end
+    end
+    @min_date = l @data.first[1]
+    @max_date = l @data.last[1]
+    # Берём логи за определённый промежуток времени
+    if params["nginx_graph_form_from"].present?
+      @begin_date = DateTime.strptime(params["nginx_graph_form_from"], format_show_datetime("minute"))
+      @data = @data.select{|x| x[1] > @begin_date }
+    end
+    if params["nginx_graph_form_to"].present?
+      @end_date = DateTime.strptime(params["nginx_graph_form_to"], format_show_datetime("minute"))
+      @data = @data.select{|x| x[1] < @end_date }
+    end
+
     @nginx_logs_path = nginx_logs_hot_catch_app_url(@hot_catch_app)
     @nginx_graph_form_step = params["nginx_graph_form_step"].present? ? params["nginx_graph_form_step"] : "hour"
 
@@ -28,8 +52,18 @@ class HotCatchAppsController < ApplicationController
     @show_datetime_format = format_show_datetime(@nginx_graph_form_step)
 
     @graphic_stats = @data.map{|x| x[1].strftime(@parse_c3_date_format)}.group_by{|e| e}.map{|k, v| [k, v.length]}
-    @graph_data_x = @graphic_stats.map{|x| x[0]}
-    @graph_data_y = @graphic_stats.map{|x| x[1]}
+    @graph_data_x = @graphic_stats.map{|x| x[0]} # DATE
+    @graph_data_y = @graphic_stats.map{|x| x[1]} # COUNT REQUESTS
+
+    if @begin_date.present? && @end_date.present? && @begin_date > @end_date
+      @error_date = true
+    else
+      @begin_date = (@begin_date.blank? ? DateTime.strptime(@graph_data_x.first, format_c3_date(@nginx_graph_form_step)) \
+        : @begin_date).strftime(format_show_datetime("minute"))
+
+      @end_date = (@end_date.blank? ? DateTime.strptime(@graph_data_x.last, format_c3_date(@nginx_graph_form_step)) \
+        : @end_date).strftime(format_show_datetime("minute"))
+    end
 
     render :load_nginx_graph, :layout => false
   end

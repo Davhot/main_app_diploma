@@ -1,11 +1,21 @@
 ru:
-  nginx_graph_form_step:
-    datetime_fields_label: Отобразить график с шагом
-    year: Год
-    month: Месяц
-    day: День
-    hour: Час
-    minute: Минута
+  nginx_graph_form:
+    step:
+      legend: Отобразить график с шагом
+      year: Год
+      month: Месяц
+      day: День
+      hour: Час
+      minute: Минута
+    interval:
+      legend: Ограничить по времени
+      from: С
+      to: По
+    type:
+      legend: Режим просмотра
+      all: Данные по всем запросам
+      ip: Данные по выбранному IP
+      visitor: Данные по выбранному посетителю
 
   app:
     apps:

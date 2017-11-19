@@ -13,9 +13,11 @@
           %td.n-item-error= i
           %td
             %span{class: "#{case_status_class(log.status)}"}= log.status
-            = log.log_data.split("\n")[0]
+            - if log.present?
+              = log.log_data.split("\n")[0].split(" ").map{|s| s.truncate(30, separator: /./)}.join(" ")
+            - else
+              -
           %td
-            - str = "#{DateTime.now} 192.168.111.113<br><hr><br>" * 10
             %span{"data-toggle": "modal", "data-target": "#log-modal-#{log.id}"}
               - if log.status == "SUCCESS"
                 %span.badge.badge-success= log.count_log

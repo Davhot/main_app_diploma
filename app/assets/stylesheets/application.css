@@ -13,5 +13,6 @@
  *= require theme
  *= require jquery-ui.min
  *= require c3.min
+ *= require bootstrap-datetimepicker
  *= require_self
  */

@@ -5,7 +5,8 @@ class ParseNginx
     @data = File.open(file, 'r'){|file| file.readlines}
     # [IP, DATE]
     @data.map!{|x| [x.match(/(^\d+\.\d+\.\d+\.\d+)/)[1],
-      DateTime.strptime(x.match(/\[(.*)\]/)[1], "%d/%b/%Y:%H:%M:%S %z")]}
+      DateTime.strptime(x.match(/\[(.*)\]/)[1], "%d/%b/%Y:%H:%M:%S %z"),
+      x.scan(/".*?"/)[-1]]}
   end
 
   def parse_file_for_date(file, string_date)
