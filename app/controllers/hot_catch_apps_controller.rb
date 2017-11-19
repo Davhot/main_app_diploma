@@ -4,6 +4,8 @@ class HotCatchAppsController < ApplicationController
   before_action -> {redirect_if_not_one_of_role_in ["admin"]}
 
   include FormatDates
+
+  # ============================================================================
   # Ajax получение данных лога по клику на точку графика
   def nginx_logs
     parser = ParseNginx.new
@@ -22,6 +24,7 @@ class HotCatchAppsController < ApplicationController
     @data = parser.data
     @ips = @data.map{|x| x[0]}.uniq
     @visitors = @data.map{|x| [x[0], "#{x[0]}|#{x[2]}"]}.uniq
+
     if params["nginx_graph_form_type"].present?
       @cur_ip = params["nginx_graph_form_ip"] if params["nginx_graph_form_ip"].present?
       @cur_visitor = params["nginx_graph_form_visitor"] if params["nginx_graph_form_visitor"].present?
@@ -92,12 +95,15 @@ class HotCatchAppsController < ApplicationController
       redirect_to hot_catch_apps_path
     end
   end
+  # ============================================================================
 
+  # ============================================================================
   def show_server_statistic
     if @hot_catch_app.system_metrics.blank?
       flash[:danger] = "Статистика не найдена"
       redirect_to hot_catch_apps_path
     else
+      gon.server_main_staticstic_path = get_ajax_table_main_metric_hot_catch_app_url(@hot_catch_app)
       @main_metric = @hot_catch_app.main_metric
       @metrics = @hot_catch_app.system_metrics.order(:get_time).last(100)
       @disks = @hot_catch_app.disks
@@ -113,10 +119,38 @@ class HotCatchAppsController < ApplicationController
     end
   end
 
+  # Ajax подгрузка нагрузки на систему
+  def get_ajax_table_main_metric
+    @main_metric = @hot_catch_app.main_metric
+    @metrics2 = @hot_catch_app.system_metrics.order(:get_time)
+    @n_metrics = @metrics2.last(4)
+    @metrics = []
+
+    hash = @metrics2.group_by{|x| x.get_time.strftime("%D %H:%M")}
+    hash = @metrics2.group_by{|x| x.get_time.strftime("%D %H")}
+    hash.each do |key, val|
+      a = [0, 0, 0, 0]
+      for metric in val do
+        a[0] += metric.cpu_average_minute.to_f
+        a[1] += metric.memory_used.to_i
+        a[2] += metric.swap_used
+        a[3] += metric.descriptors_used
+      end
+      a.map!{|x| x /= val.size}
+      a.unshift(DateTime.strptime(key, "%D %H"))
+      @metrics << a
+    end
+    @metrics = @metrics.last(100)
+
+    render :get_ajax_table_main_metric, :layout => false
+  end
+  # ============================================================================
+
   def index
     @hot_catch_apps = HotCatchApp.paginate(:page => params[:page]).order('created_at DESC')
   end
 
+  # ============================================================================
   def show
     @logs = @hot_catch_app.main_hot_catch_logs
     unless !params[:type].present? || (params[:type] == "all-filter")
@@ -134,6 +168,7 @@ class HotCatchAppsController < ApplicationController
       format.html
     end
   end
+  # ============================================================================
 
   def new
     @hot_catch_app = HotCatchApp.new

@@ -114,7 +114,7 @@
                     %td= number_to_human_size(stat["bytes"]["count"])
                     %td= stat["method"]
                     %td= stat["protocol"]
-                    %td= stat["data"]
+                    %td.truncated-td= stat["data"]
         .row
           .col-md-12
             .nginx-block

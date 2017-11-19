@@ -9,6 +9,7 @@ Rails.application.routes.draw do
       get 'show_server_statistic', to: "hot_catch_apps#show_server_statistic"
       get 'nginx_logs', to: "hot_catch_apps#nginx_logs"
       get 'load_nginx_graph', to: "hot_catch_apps#load_nginx_graph"
+      get 'get_ajax_table_main_metric'
     end
   end
 
