@@ -14,5 +14,6 @@
  *= require jquery-ui.min
  *= require c3.min
  *= require bootstrap-datetimepicker
+ *= require pretty_checkbox
  *= require_self
  */

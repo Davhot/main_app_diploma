@@ -3,7 +3,9 @@
   %li.active= t('app.apps.server_statistic')
   %li= link_to t('app.apps.header_index'), hot_catch_apps_path
 
-= render 'original_tables'
+#main_system_metrics
+#main_network_metrics
+
 .row
   .filter-container
     .nginx-logs
@@ -40,65 +42,158 @@
       .row
         .col-md-12
           .nginx-block
-            .nginx-header Нагрузка на систему
+            .nginx-header Нагрузка на систему (средние значения)
+
+            = form_tag(get_ajax_table_main_metric_hot_catch_app_url(@hot_catch_app),
+              method: 'get', remote: true, id: "get_ajax_table_main_metric") do
+              .row
+                .col-md-12
+                  %fieldset
+                    %legend.header= I18n.t("legend", scope: "main_metric_table_form.step")
+                    .flex-items
+                      - for type in ["month", "day", "hour", "minute"] do
+                        %p
+                          = radio_button_tag :main_metric_form_step, type, (type == "hour")
+                          = label_tag ("main_metric_form_step_" + type), I18n.t(type, scope: "nginx_graph_form.step")
+              .row
+                .col-md-12
+                  %fieldset
+                    %legend.header= I18n.t("legend", scope: "main_metric_table_form.row")
+                    .flex-items
+                      - for type in ["processor", "memory", "swap", "descriptors"] do
+                        .pretty.p-round.p-icon
+                          = check_box_tag "main_metric_form_row_#{type}", type, true
+                          .state
+                            = fa_icon "check", class: "icon mdi mdi-check"
+                            = label_tag ("main_metric_form_row_" + type), I18n.t(type, scope: "main_metric_table_form.row")
+                    %br
+              .row
+                .col-md-12
+                  %fieldset
+                    %legend.header
+                      = I18n.t("legend", scope: "nginx_graph_form.interval")
+                      #show-main-metric-min-max-time
+                    .col-md-6
+                      .form-group
+                        .input-group.date.datetimepicker
+                          %span.input-group-addon
+                            = t("from", scope: "nginx_graph_form.interval")
+                          = text_field_tag :main_metric_table_form_from, nil, class: 'form-control'
+                          %span.input-group-addon
+                            %span.glyphicon.glyphicon-calendar
+                    .col-md-6
+                      .form-group
+                        .input-group.date.datetimepicker
+                          %span.input-group-addon
+                            = t("to", scope: "nginx_graph_form.interval")
+                          = text_field_tag :main_metric_table_form_to, nil, class: 'form-control'
+                          %span.input-group-addon
+                            %span.glyphicon.glyphicon-calendar
+
+              .row
+                .col-md-12.text-right
+                  %button.btn.btn-info#reset-main-metric-table-form Сбросить
+                  %button.btn.btn-primary Отобразить
+
             %table.table#metrics-show
               %tr
-                %td= t("metrics.date")
-                - for metric in @n_metrics do
+                %td= render 'spinner'
+                - @rows_main_metric.times do
                   %td
-              %tr
-                %td= t("metrics.time")
-                - for metric in @n_metrics do
+              %tr.show_time
+                %td= render 'spinner'
+                - @rows_main_metric.times do
                   %td
-              %tr
-                %td= t("metrics.cpu_average_minute")
-                - for metric in @n_metrics do
+              %tr.show_processor
+                %td= render 'spinner'
+                - @rows_main_metric.times do
                   %td
-              %tr
-                %td= t("metrics.memory_used") + " (доступно #{number_to_human_size(@main_metric.memory_size * 2 ** 20)})"
-                - for metric in @n_metrics do
+              %tr.show_memory
+                %td= render 'spinner'
+                - @rows_main_metric.times do
                   %td
-              %tr
-                %td= t("metrics.swap_used") + " (доступно #{number_to_human_size(@main_metric.swap_size * 2 ** 20)})"
-                - for metric in @n_metrics do
+              %tr.show_swap
+                %td= render 'spinner'
+                - @rows_main_metric.times do
                   %td
-              %tr
-                %td= t("metrics.descriptors_used") + " (максимум #{@main_metric.descriptors_max})"
-                - for metric in @n_metrics do
+              %tr.show_descriptors
+                %td= render 'spinner'
+                - @rows_main_metric.times do
                   %td
             %p
               %label Столбцы:
               %input{type: "text", class:"amount", readonly:true, style:"border:0; color:#f6931f; font-weight:bold;"}
             .slider{data: {"orig-table": "#metrics-orig", "show-table": "#metrics-show",
-              "start-n-elements": "#{@n_metrics.size}"}}
+              "start-n-elements": "#{@rows_main_metric}"}}
+            #slider-script-metrics-show
             %br
       %br
       .row
         .col-md-12
           .nginx-block
-            - for one_type_network in @n_networks do
-              .nginx-header= t("metrics.name_network") + ": " + one_type_network.last.name
-              %table.table{id: "network-table-show-#{one_type_network.first.name}"}
+
+            = form_tag(get_ajax_table_network_metric_hot_catch_app_url(@hot_catch_app),
+              method: 'get', remote: true, id: "get_ajax_table_network_metric") do
+              .row
+                .col-md-12
+                  %fieldset
+                    %legend.header= I18n.t("legend", scope: "main_metric_table_form.step")
+                    .flex-items
+                      - for type in ["month", "day", "hour", "minute"] do
+                        %p
+                          = radio_button_tag :network_metric_form_step, type, (type == "hour")
+                          = label_tag ("network_metric_form_step_" + type), I18n.t(type, scope: "nginx_graph_form.step")
+              .row
+                .col-md-12
+                  %fieldset
+                    %legend.header
+                      = I18n.t("legend", scope: "nginx_graph_form.interval")
+                      #show-network-metric-min-max-time
+                    .col-md-6
+                      .form-group
+                        .input-group.date.datetimepicker
+                          %span.input-group-addon
+                            = t("from", scope: "nginx_graph_form.interval")
+                          = text_field_tag :network_metric_table_form_from, nil, class: 'form-control'
+                          %span.input-group-addon
+                            %span.glyphicon.glyphicon-calendar
+                    .col-md-6
+                      .form-group
+                        .input-group.date.datetimepicker
+                          %span.input-group-addon
+                            = t("to", scope: "nginx_graph_form.interval")
+                          = text_field_tag :network_metric_table_form_to, nil, class: 'form-control'
+                          %span.input-group-addon
+                            %span.glyphicon.glyphicon-calendar
+
+              .row
+                .col-md-12.text-right
+                  %button.btn.btn-info#reset-network-metric-table-form Сбросить
+                  %button.btn.btn-primary Отобразить
+
+            - for name_network in @network_names do
+              .nginx-header= t("metrics.name_network") + ": " + name_network
+              %table.table{id: "network-table-show-#{name_network}"}
                 %tr
-                  %td= t("metrics.date")
-                  - for network in one_type_network do
-                    %td= l network.get_time, format: :date
+                  %td= render 'spinner'
+                  - @rows_network_metric.times do
+                    %td
                 %tr
-                  %td= t("metrics.time")
-                  - for network in one_type_network do
-                    %td= l network.get_time, format: :time
+                  %td= render 'spinner'
+                  - @rows_network_metric.times do
+                    %td
                 %tr
-                  %td= t("metrics.bytes_in")
-                  - for network in one_type_network do
-                    %td= number_to_human_size(network.bytes_in * 2 ** 10)
+                  %td= render 'spinner'
+                  - @rows_network_metric.times do
+                    %td
                 %tr
-                  %td= t("metrics.bytes_out")
-                  - for network in one_type_network do
-                    %td= number_to_human_size(network.bytes_out * 2 ** 10)
+                  %td= render 'spinner'
+                  - @rows_network_metric.times do
+                    %td
               %p
                 %label Столбцы:
                 %input{type: "text", class:"amount", readonly:true, style:"border:0; color:#f6931f; font-weight:bold;"}
-              .slider{data: {"orig-table": "#network-table-orig-#{one_type_network.first.name}",
-                "show-table": "#network-table-show-#{one_type_network.first.name}",
-                "start-n-elements": "#{one_type_network.size}"}}
+              .slider{data: {"orig-table": "#network-table-orig-#{name_network}",
+                "show-table": "#network-table-show-#{name_network}",
+                "start-n-elements": "#{@rows_network_metric}"}}
               %br

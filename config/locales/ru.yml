@@ -16,6 +16,15 @@ ru:
       all: Данные по всем запросам
       ip: Данные по выбранному IP
       visitor: Данные по выбранному посетителю
+  main_metric_table_form:
+    step:
+      legend: Шаг
+    row:
+      legend: Параметры
+      processor: Процессор
+      memory: Оперативная память
+      swap: Файл подкачки
+      descriptors: Доступные дескрипторы
 
   app:
     apps:
@@ -43,12 +52,13 @@ ru:
   time:
     formats:
       default: "%d.%m.%Y %H:%M:%S"
+      month: "%m.%Y"
       date: "%d.%m.%Y"
       time: "%H:%M:%S"
   metrics:
     date: Дата
     time: Время
-    cpu_average_minute: Средняя нагрузка на процессор за последнюю минуту
+    cpu_average_minute: Средняя нагрузка на процессор
     memory_size: Объём оперативной памяти
     memory_used: Использование оперативной памяти
     swap_size: Доступный размер файла подкачки

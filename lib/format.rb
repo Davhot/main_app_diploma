@@ -1,3 +1,4 @@
+# TODO: переписать в config/locales/ru.yml
 module FormatDates
   extend ActiveSupport::Concern
   def format_moment(word)
@@ -17,6 +18,8 @@ module FormatDates
 
   def format_c3_date(word)
     case word
+    when "second"
+      '%Y-%m-%d %H:%M:%S'
     when "minute"
       '%Y-%m-%d %H:%M'
     when "hour"

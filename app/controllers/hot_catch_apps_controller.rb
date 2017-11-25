@@ -104,30 +104,149 @@ class HotCatchAppsController < ApplicationController
       redirect_to hot_catch_apps_path
     else
       gon.server_main_staticstic_path = get_ajax_table_main_metric_hot_catch_app_url(@hot_catch_app)
-      @main_metric = @hot_catch_app.main_metric
-      @metrics = @hot_catch_app.system_metrics.order(:get_time).last(100)
+      gon.server_network_staticstic_path = get_ajax_table_network_metric_hot_catch_app_url(@hot_catch_app)
       @disks = @hot_catch_app.disks
 
-      @networks = []
-      for name in @hot_catch_app.network_interfaces do
-        @networks << @hot_catch_app.networks.where(name: name).last(150)
-      end
+      @network_names = @hot_catch_app.network_interfaces
 
-      @n_metrics = @metrics.last(4)
-
-      @n_networks = @networks.map{|network| network.last(5)}
+      @rows_main_metric = 4
+      @rows_network_metric = 5
     end
   end
 
+  # Ajax подгрузка сетевых интерфейсов
+  # TODO: 1. Сделать собирательную статистику по часам и дням (отдельные таблицы в бд)
+  # TODO: 2. Перенести логику в модель
+  # TODO: 3. Локализацию времени перенести из lib в locales/ru.yml
+  # TODO: 4. При нажатии на кнопку отобразить, показывать spiner, чтобы видно было, как данные загружаются
+  def get_ajax_table_network_metric
+    @min_date = Network.where(hot_catch_app_id: @hot_catch_app.id)
+      .order(:get_time).first.get_time.change(:offset => DateTime.now.zone).utc
+    @max_date = Network.where(hot_catch_app_id: @hot_catch_app.id)
+      .order(:get_time).last.get_time.change(:offset => DateTime.now.zone).utc
+    # Настройки ============
+    if params[:network_metric_form_step].blank?
+      @step_metric = "hour"
+      @show_time = true
+    else
+      @step_metric = params[:network_metric_form_step]
+    end
+
+    if params[:network_metric_table_form_from].present?
+      @begin_date = DateTime.strptime(params[:network_metric_table_form_from],
+        format_show_datetime("minute")).change(:offset => DateTime.now.zone).utc
+    else
+      @begin_date = @min_date
+    end
+
+    if params[:network_metric_table_form_to].present?
+      @end_date = DateTime.strptime(params[:network_metric_table_form_to],
+        format_show_datetime("minute")).change(:offset => DateTime.now.zone).utc
+    else
+      @end_date = @max_date
+    end
+    # ======================
+
+    case @step_metric
+    when "month"
+      @format_date = ("%m.%Y")
+    when "day"
+      @format_date = ("%D")
+    when "hour"
+      @format_date = ("%D %H")
+      @show_time = true
+    else
+      @format_date = ("%D %H:%M")
+      @show_time = true
+    end
+
+    @name_networks = @hot_catch_app.network_interfaces
+    @name_networks.map!{|name| [name]}
+
+    @name_networks.each_with_index do |name, index|
+      @networks = []
+      networks = Network.where(hot_catch_app_id: @hot_catch_app.id, name: name[0]).where(
+        "get_time >= ? AND get_time <= ?",
+        @begin_date.strftime(format_c3_date("second")),
+        @end_date.strftime(format_c3_date("second"))
+      ).order(:get_time)
+      networks.group_by{|x| x.get_time.strftime(@format_date)}.each do |key, val|
+        a = [0, 0]
+        for network in val do
+          a[0] += network.bytes_in.to_f
+          a[1] += network.bytes_out.to_f
+        end
+        a.unshift(DateTime.strptime(key, @format_date))
+        @networks << a
+      end
+      @name_networks[index] << @networks.last(150)
+    end
+
+    render :get_ajax_table_network_metric, :layout => false
+  end
+
   # Ajax подгрузка нагрузки на систему
+  # TODO: 1. Сделать собирательную статистику по часам и дням (отдельные таблицы в бд)
+  # TODO: 2. Перенести логику в модель
+  # TODO: 3. Локализацию времени перенести из lib в locales/ru.yml
+  # TODO: 4. При нажатии на кнопку отобразить, показывать spiner, чтобы видно было, как данные загружаются
   def get_ajax_table_main_metric
     @main_metric = @hot_catch_app.main_metric
-    @metrics2 = @hot_catch_app.system_metrics.order(:get_time)
-    @n_metrics = @metrics2.last(4)
-    @metrics = []
+    @min_time = @hot_catch_app.system_metrics.order(:get_time).first.get_time.change(:offset => DateTime.now.zone).utc
+    @max_time = @hot_catch_app.system_metrics.order(:get_time).last.get_time.change(:offset => DateTime.now.zone).utc
+    # Настройки ============
+    if params[:main_metric_form_step].blank?
+      @step_metric = "hour"
+      @show_time = true
+      @show_processor = true
+      @show_memory = true
+      @show_swap = true
+      @show_descriptors = true
+    else
+      @show_processor = params[:main_metric_form_row_processor].present?
+      @show_memory = params[:main_metric_form_row_memory].present?
+      @show_swap = params[:main_metric_form_row_swap].present?
+      @show_descriptors = params[:main_metric_form_row_descriptors].present?
+      @step_metric = params[:main_metric_form_step]
+    end
 
-    hash = @metrics2.group_by{|x| x.get_time.strftime("%D %H:%M")}
-    hash = @metrics2.group_by{|x| x.get_time.strftime("%D %H")}
+    if params[:main_metric_table_form_from].present?
+      @begin_date = DateTime.strptime(params[:main_metric_table_form_from],
+        format_show_datetime("minute")).change(:offset => DateTime.now.zone).utc
+    else
+      @begin_date = @min_time
+    end
+
+    if params[:main_metric_table_form_to].present?
+      @end_date = DateTime.strptime(params[:main_metric_table_form_to],
+        format_show_datetime("minute")).change(:offset => DateTime.now.zone).utc
+    else
+      @end_date = @max_time
+    end
+    # ======================
+
+    case @step_metric
+    when "month"
+      @format_date = ("%m.%Y")
+    when "day"
+      @format_date = ("%D")
+    when "hour"
+      @format_date = ("%D %H")
+      @show_time = true
+    else
+      @format_date = ("%D %H:%M")
+      @show_time = true
+    end
+
+
+    @all_metrics = @hot_catch_app.system_metrics.where(
+      "get_time >= ? AND get_time <= ?",
+      @begin_date.strftime(format_c3_date("second")),
+      @end_date.strftime(format_c3_date("second"))
+    ).order(:get_time)
+
+    @metrics = []
+    hash = @all_metrics.group_by{|x| x.get_time.strftime(@format_date)}
     hash.each do |key, val|
       a = [0, 0, 0, 0]
       for metric in val do
@@ -137,7 +256,7 @@ class HotCatchAppsController < ApplicationController
         a[3] += metric.descriptors_used
       end
       a.map!{|x| x /= val.size}
-      a.unshift(DateTime.strptime(key, "%D %H"))
+      a.unshift(DateTime.strptime(key, @format_date))
       @metrics << a
     end
     @metrics = @metrics.last(100)

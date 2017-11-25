@@ -9,6 +9,9 @@ $(".slider").each(function () {
   } else {
     minrange = max - 1;
   }
+  if($(".ui-slider-range", this).length) {
+    elem.dragslider("destroy")
+  }
   elem.dragslider({
     range: true,
     min: 1,
@@ -18,7 +21,7 @@ $(".slider").each(function () {
     values: [ value1, value2],
     rangeDrag: true,
     create: function( event, ui ) {
-      $(this).prev().find(".amount").val( value1 + " - " + (value2 - 1)  + " (" + (max - 1) + ")"  );
+      $(this).prev().find(".amount").attr('value', value1 + " - " + (value2 - 1)  + " (" + (max - 1) + ")"  );
         // Показываем значения
         cur_val = value1
         cur_tr_show = $($(this).attr("data-show-table") + " tr")
