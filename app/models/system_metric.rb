@@ -10,6 +10,6 @@ class SystemMetric < ApplicationRecord
   # validates :descriptors_used, presence: true
 
   def self.cpu_average_minute_in_percent(cpu_average_minute)
-    "#{(cpu_average_minute * 10).round(2)}%"
+    "#{(cpu_average_minute * 100).round(2)}%"
   end
 end

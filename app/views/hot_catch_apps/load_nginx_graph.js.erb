@@ -31,7 +31,10 @@ var chart;
         $("#modal-nginx-logs").modal('show');
         find_date = moment(d.x).lang("en").format('<%== @moment_format %>');
         return $.ajax({
-          url: '<%= @nginx_logs_path %>' + "?nginx-date=" + find_date
+          url: '<%= @nginx_logs_path %>',
+          data: {
+            "nginx-date": find_date
+          }
         }).done(function(data) {
           var i, j, len, nginx_log, ref, results;
           if (data.status) {
@@ -68,5 +71,16 @@ var chart;
       hide: 'Nginx'
     }
   });
+
+  $(".sidebar-toggle").click(function () {
+    resize_chart()
+  })
+
+  async function resize_chart() {
+    $('#nginx-chart').css({"opacity": 0})
+    await sleep(400);
+    chart.resize();
+    $('#nginx-chart').css({"opacity": 1})
+  }
 
 <% end %>

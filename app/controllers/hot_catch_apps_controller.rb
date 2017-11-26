@@ -1,4 +1,5 @@
 class HotCatchAppsController < ApplicationController
+  # TODO: разбить на 3 контроллера: логи Rails, Nginx и сервера
   before_action :set_hot_catch_app, except: [:index]
 
   before_action -> {redirect_if_not_one_of_role_in ["admin"]}
@@ -98,6 +99,162 @@ class HotCatchAppsController < ApplicationController
   # ============================================================================
 
   # ============================================================================
+  def load_network_graph
+    @min_date = Network.where(hot_catch_app_id: @hot_catch_app.id)
+      .order(:get_time).first.get_time.change(:offset => DateTime.now.zone).utc
+    @max_date = Network.where(hot_catch_app_id: @hot_catch_app.id)
+      .order(:get_time).last.get_time.change(:offset => DateTime.now.zone).utc
+    # Настройки ============
+    if params[:network_metric_form_step].blank?
+      @step_metric = "hour"
+      @show_time = true
+    else
+      @step_metric = params[:network_metric_form_step]
+    end
+
+    if params[:network_metric_graph_form_from].present?
+      @begin_date = DateTime.strptime(params[:network_metric_graph_form_from],
+        format_show_datetime("minute")).change(:offset => DateTime.now.zone).utc
+    else
+      @begin_date = @min_date
+    end
+
+    if params[:network_metric_graph_form_to].present?
+      @end_date = DateTime.strptime(params[:network_metric_graph_form_to],
+        format_show_datetime("minute")).change(:offset => DateTime.now.zone).utc
+    else
+      @end_date = @max_date
+    end
+    # ======================
+
+    case @step_metric
+    when "month"
+      @format_date = ("%m.%Y")
+    when "day"
+      @format_date = ("%D")
+    when "hour"
+      @format_date = ("%D %H")
+      @show_time = true
+    else
+      @format_date = ("%D %H:%M")
+      @show_time = true
+    end
+
+    @name_networks = @hot_catch_app.network_interfaces
+
+    @moment_format = format_moment(@step_metric)
+    @parse_c3_date_format = format_c3_date(@step_metric)
+    @show_datetime_format = format_show_datetime(@step_metric)
+
+
+    @x = []
+    @y = []
+
+    @name_networks.each_with_index do |name, index|
+      @networks = []
+      networks = Network.where(hot_catch_app_id: @hot_catch_app.id, name: name).where(
+        "get_time >= ? AND get_time <= ?",
+        @begin_date.strftime(format_c3_date("second")),
+        @end_date.strftime(format_c3_date("second"))
+      ).order(:get_time)
+      @y << ["#{name}: входящий трафик"]
+      @y << ["#{name}: исходящий трафик"]
+      @y << ["x#{index + 1}"]
+      @x << [@y[-2][0], @y[-1][0]]
+      @x << [@y[-3][0], @y[-1][0]]
+      networks.group_by{|x| x.get_time.strftime(@format_date)}.each do |key, val|
+        a = [0, 0]
+        for network in val do
+          a[0] += network.bytes_in.to_f
+          a[1] += network.bytes_out.to_f
+        end
+        @y[-3] << a[0].round(2)
+        @y[-2] << a[1].round(2)
+        @y[-1] << DateTime.strptime(key, @format_date).strftime(@parse_c3_date_format)
+      end
+    end
+    # ОТОБРАЖАЕМ @x и @y
+    render :load_network_graph, :layout => false
+  end
+
+
+  def load_main_metric_graph
+    @min_date = @hot_catch_app.system_metrics.order(:get_time).first
+      .get_time.change(:offset => DateTime.now.zone).utc
+    @max_date = @hot_catch_app.system_metrics.order(:get_time).last
+      .get_time.change(:offset => DateTime.now.zone).utc
+    # Настройки ============
+    if params[:main_metric_form_step].blank?
+      @step_metric = "hour"
+      @show_time = true
+    else
+      @step_metric = params[:main_metric_form_step]
+    end
+
+    if params[:main_metric_graph_form_from].present?
+      @begin_date = DateTime.strptime(params[:main_metric_graph_form_from],
+        format_show_datetime("minute")).change(:offset => DateTime.now.zone).utc
+    else
+      @begin_date = @min_date
+    end
+
+    if params[:main_metric_graph_form_to].present?
+      @end_date = DateTime.strptime(params[:main_metric_graph_form_to],
+        format_show_datetime("minute")).change(:offset => DateTime.now.zone).utc
+    else
+      @end_date = @max_date
+    end
+    # ======================
+
+    case @step_metric
+    when "month"
+      @format_date = ("%m.%Y")
+    when "day"
+      @format_date = ("%D")
+    when "hour"
+      @format_date = ("%D %H")
+      @show_time = true
+    else
+      @format_date = ("%D %H:%M")
+      @show_time = true
+    end
+
+    @moment_format = format_moment(@step_metric)
+    @parse_c3_date_format = format_c3_date(@step_metric)
+    @show_datetime_format = format_show_datetime(@step_metric)
+
+    @all_metrics = @hot_catch_app.system_metrics.where(
+      "get_time >= ? AND get_time <= ?",
+      @begin_date.strftime(format_c3_date("second")),
+      @end_date.strftime(format_c3_date("second"))
+    ).order(:get_time)
+
+    @x = ["x1"]
+    @y = [["процессор"], ["использование памяти"],
+      ["файл подкачки"], ["используемые дескрипторы"]]
+    hash = @all_metrics.group_by{|x| x.get_time.strftime(@format_date)}
+    hash.each do |key, val|
+      a = [0, 0, 0, 0]
+      for metric in val do
+        a[0] += metric.cpu_average_minute.to_f
+        a[1] += metric.memory_used.to_i
+        a[2] += metric.swap_used
+        a[3] += metric.descriptors_used
+      end
+      a.map!{|x| x /= val.size}
+      a[0] = (a[0] * 100).round(2)
+      @x << DateTime.strptime(key, @format_date).strftime(@parse_c3_date_format)
+      @y.each_with_index{|elem, index| elem << a[index]}
+    end
+    # ОТОБРАЖАЕМ @x и @y
+    render :load_main_metric_graph, :layout => false
+  end
+
+  def show_server_graph
+    gon.network_load_graph_path = load_network_graph_hot_catch_app_url(@hot_catch_app)
+    gon.main_metric_load_graph_path = load_main_metric_graph_hot_catch_app_url(@hot_catch_app)
+  end
+
   def show_server_statistic
     if @hot_catch_app.system_metrics.blank?
       flash[:danger] = "Статистика не найдена"

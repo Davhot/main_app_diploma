@@ -14,7 +14,6 @@ send_ajax_request_for_getting_nginx_graph = ->
     beforeSend: ->
       $(".nginx-form-filter .nginx-form-filter-field").attr("disabled", true)
       $(".nginx-form-filter-field").addClass("disabled")
-      # $("#nginx-chart").html($("#spinner").attr("data-spinner"))
   ).done( ->
     $(".nginx-form-filter .nginx-form-filter-field").removeAttr("disabled")
     $(".nginx-form-filter-field").removeClass("disabled")

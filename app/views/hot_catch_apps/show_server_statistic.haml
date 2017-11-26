@@ -1,7 +1,14 @@
--provide(:title, t('app.apps.server_statistic'))
+-provide(:title, t('app.apps.server.headers.index'))
 =breadcrumb_tag do
-  %li.active= t('app.apps.server_statistic')
+  %li.active= t('app.apps.server.headers.index')
   %li= link_to t('app.apps.header_index'), hot_catch_apps_path
+
+.row
+  .filter-container
+    .nginx-logs
+      %div
+        = link_to "Отобразить инфографику", show_server_graph_hot_catch_app_path(@hot_catch_app),
+        class: "filter-button link-no-style"
 
 #main_system_metrics
 #main_network_metrics

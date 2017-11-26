@@ -11,6 +11,9 @@ Rails.application.routes.draw do
       get 'load_nginx_graph', to: "hot_catch_apps#load_nginx_graph"
       get 'get_ajax_table_main_metric'
       get 'get_ajax_table_network_metric'
+      get 'show_server_graph'
+      get 'load_network_graph'
+      get 'load_main_metric_graph'
     end
   end
 

@@ -9,7 +9,7 @@ class ParseNginx
       x.scan(/".*?"/)[-1]]}
   end
 
-  def parse_file_for_date(file, string_date)
+  def parse_file_for_date(file, string_date, ip = nil, visitor = nil)
     @data = File.open(file, 'r'){|file| file.readlines}
     string_date = Regexp.new(string_date)
     @data = @data.select{|x| x =~ string_date}

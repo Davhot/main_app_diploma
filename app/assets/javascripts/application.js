@@ -20,3 +20,13 @@
 //= require d3.v3.min
 //= require c3.min
 //= require_tree .
+
+function humanFileSize(size) {
+  if(size <= 0) { return size }
+  var i = Math.floor( Math.log(size) / Math.log(1024) );
+  return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+};
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+};

@@ -34,8 +34,10 @@ ru:
         headers:
           index: Статистика Nginx
           graphic: Инфографика
-
-      server_statistic: Нагрузка на систему
+      server:
+        headers:
+          index: Нагрузка на систему
+          graphic: Инфографика
 
   will_paginate:
     previous_label: "←"
