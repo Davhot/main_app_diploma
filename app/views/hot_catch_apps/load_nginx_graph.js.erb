@@ -2,7 +2,7 @@ var chart;
 
 <% if @error_date %>
   alert("Неверный формат даты")
-<% elsif @graph_data_x.count > 0 %>
+<% elsif @graph_data_x.present? && @graph_data_x.count > 0 %>
   $("#nginx_graph_form_from").val("<%= @begin_date %>")
   $("#nginx_graph_form_to").val("<%= @end_date %>")
   $("#limit-date").text("(<%= @min_date %> - <%= @max_date %>)")

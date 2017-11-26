@@ -30,6 +30,7 @@ ru:
     apps:
       header_index: Приложения
       header_show: Ошибки приложения
+      header_graph: Инфографика
       nginx:
         headers:
           index: Статистика Nginx

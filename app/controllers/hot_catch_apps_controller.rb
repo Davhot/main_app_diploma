@@ -1,3 +1,14 @@
+# TODO: рефакторинг
+# 1. Вынести методы в модели
+# 2. Сделать локализацию дат в locales/
+# 3. Добавить 3 контроллера, унаследованные от текущего: 1. Nginx 2. Rails 3. System и вынести методы туда
+# 4. Общие методы вынести в даный контроллер
+# TODO: ускорение:
+# Сделать модели за час и день для System и накапливать в них значения
+# TODO: доделать
+# 1. Фильтры на Rails график
+# 2. Показ кусок Nginx лога по IP или посетителю (сейчас все IP за указанный период)
+
 class HotCatchAppsController < ApplicationController
   # TODO: разбить на 3 контроллера: логи Rails, Nginx и сервера
   before_action :set_hot_catch_app, except: [:index]
@@ -272,10 +283,6 @@ class HotCatchAppsController < ApplicationController
   end
 
   # Ajax подгрузка сетевых интерфейсов
-  # TODO: 1. Сделать собирательную статистику по часам и дням (отдельные таблицы в бд)
-  # TODO: 2. Перенести логику в модель
-  # TODO: 3. Локализацию времени перенести из lib в locales/ru.yml
-  # TODO: 4. При нажатии на кнопку отобразить, показывать spiner, чтобы видно было, как данные загружаются
   def get_ajax_table_network_metric
     @min_date = Network.where(hot_catch_app_id: @hot_catch_app.id)
       .order(:get_time).first.get_time.change(:offset => DateTime.now.zone).utc
@@ -343,10 +350,6 @@ class HotCatchAppsController < ApplicationController
   end
 
   # Ajax подгрузка нагрузки на систему
-  # TODO: 1. Сделать собирательную статистику по часам и дням (отдельные таблицы в бд)
-  # TODO: 2. Перенести логику в модель
-  # TODO: 3. Локализацию времени перенести из lib в locales/ru.yml
-  # TODO: 4. При нажатии на кнопку отобразить, показывать spiner, чтобы видно было, как данные загружаются
   def get_ajax_table_main_metric
     @main_metric = @hot_catch_app.main_metric
     @min_time = @hot_catch_app.system_metrics.order(:get_time).first.get_time.change(:offset => DateTime.now.zone).utc
@@ -427,6 +430,46 @@ class HotCatchAppsController < ApplicationController
   end
 
   # ============================================================================
+  def load_rails_graph
+    if params[:rails_graph_form_step].blank?
+      @step_metric = "hour"
+      @show_time = true
+    else
+      @step_metric = params[:rails_graph_form_step]
+    end
+
+    # raise @step_metric
+
+    case @step_metric
+    when "month"
+      @format_date = ("%m.%Y")
+    when "day"
+      @format_date = ("%D")
+    when "hour"
+      @format_date = ("%D %H")
+      @show_time = true
+    else
+      @format_date = ("%D %H:%M")
+      @show_time = true
+    end
+
+    @moment_format = format_moment(@step_metric)
+    @parse_c3_date_format = format_c3_date(@step_metric)
+    @show_datetime_format = format_show_datetime(@step_metric)
+
+    @requests = UserRequest.non_success_count_date(@hot_catch_app, @format_date)
+    a1, a2 = ["x"], ["Rails"]
+    @requests.each{ |a| a1 << DateTime.strptime(a[0], @format_date)
+      .strftime(@parse_c3_date_format); a2 << a[1] }
+    @requests = [a1, a2]
+
+    render :load_rails_graph, :layout => false
+  end
+
+  def show_rails_graph
+    gon.load_rails_graph_path = load_rails_graph_hot_catch_app_url(@hot_catch_app)
+  end
+
   def show
     @logs = @hot_catch_app.main_hot_catch_logs
     unless !params[:type].present? || (params[:type] == "all-filter")
