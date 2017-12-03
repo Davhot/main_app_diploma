@@ -25,7 +25,7 @@ var chart_main_metric;
       format: {
         value: function (value, ratio, id) {
           if(id == '<%== @y[1][0] %>' || id == '<%== @y[2][0] %>'){
-            return humanFileSize(value * 2 ** 10);
+            return humanFileSize(value);
           } else {
             return value + '%'
           }
@@ -35,7 +35,7 @@ var chart_main_metric;
     axis: {
       y: {
         tick: {
-          format: function (value) { return humanFileSize(value * 2 ** 10) }
+          format: function (value) { return humanFileSize(value) }
         }
       },
       y2: {

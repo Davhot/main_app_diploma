@@ -17,6 +17,37 @@ class HotCatchAppsController < ApplicationController
 
   include FormatDates
 
+  def show_all_graphs
+    gon.all_graphs_path = load_all_graphs_hot_catch_app_path(@hot_catch_app)
+  end
+
+  def load_all_graphs
+    @step = params["all_graphs_step"].present? ? params["all_graphs_step"] : "hour"
+    @from = params["all_graphs_from"].present? ? params["all_graphs_from"] : nil
+    @to = params["all_graphs_to"].present? ? params["all_graphs_to"] : nil
+
+    @network_links, @network_x_y = Network.get_data_graph(@hot_catch_app, @step, @from, @to) # Networks
+    @x_main_metric, @y_main_metric = SystemMetric.get_data_graph(@hot_catch_app, @step, @from, @to) # MainMetrics
+    @x_nginx, @y_nginx = MainHotCatchLog.get_nginx_data_graph(@hot_catch_app, @step, @from, @to) # Nginx
+    @x_rails, @y_rails = UserRequest.get_data_graph(@hot_catch_app, @step, @from, @to) # Rails
+
+    @links = @network_links.dup
+    @graph_arrays = @network_x_y.dup
+
+    @y_main_metric.each{|x| @links << [x[0], @x_main_metric[0]]; @graph_arrays << x}
+    @graph_arrays << @x_main_metric
+    @links << [@y_nginx[0], @x_nginx[0]]; @graph_arrays << @x_nginx; @graph_arrays << @y_nginx
+    @links << [@y_rails[0], @x_rails[0]]; @graph_arrays << @x_rails; @graph_arrays << @y_rails
+
+    str = "Networks\n" + @network_links.inspect + "\n\n" + @network_x_y.inspect + "\n\n\n"
+    str += "MainMetrics\n" + @x_main_metric.inspect + "\n\n" + @y_main_metric.inspect + "\n\n\n"
+    str += "Nginx\n" + @x_nginx.inspect + "\n\n" + @y_nginx.inspect + "\n\n\n"
+    str += "Rails\n" + @x_rails.inspect + "\n\n" + @y_rails.inspect + "\n\n\n"
+    str += "Rails\n" + @links.inspect + "\n\n" + @graph_arrays.inspect + "\n\n\n"
+    # raise str
+
+    render :load_all_graphs, :layout => false
+  end
   # ============================================================================
   # Ajax получение данных лога по клику на точку графика
   def nginx_logs
@@ -248,8 +279,8 @@ class HotCatchAppsController < ApplicationController
       a = [0, 0, 0, 0]
       for metric in val do
         a[0] += metric.cpu_average_minute.to_f
-        a[1] += metric.memory_used.to_i
-        a[2] += metric.swap_used
+        a[1] += metric.memory_used.to_i  * (2 ** 10)
+        a[2] += metric.swap_used * (2 ** 10)
         a[3] += metric.descriptors_used
       end
       a.map!{|x| x /= val.size}

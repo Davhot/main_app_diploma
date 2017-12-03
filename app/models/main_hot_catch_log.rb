@@ -13,6 +13,22 @@ class MainHotCatchLog < ApplicationRecord
   validates :from_log, presence: true, inclusion: {in: FROM}
   validates :status, presence: true, inclusion: {in: STATUSES}
 
+  def self.get_nginx_data_graph(app, step = "minute", from = nil, to = nil)
+    parser = ParseNginx.new
+    parser.parse_all_data("log/apps/#{app.name.downcase}-nginx.access.log")
+    data = parser.data
+
+    data = data.select{|x| x[1] >= from } if from
+    data = data.select{|x| x[1] <= to } if to
+
+    graphic_stats = data.map{|x| I18n.l(x[1], format: "c3_date.#{step}".to_sym) }
+      .group_by{|e| e}.map{|k, v| [k, v.length]}
+
+    # [DATE, COUNT REQUESTS]
+    [graphic_stats.map{|x| x[0]}.unshift("x_nginx"),
+      graph_data_y = graphic_stats.map{|x| x[1]}.unshift("Nginx")]
+  end
+
   def set_data_and_save
     set_app
     process_log_data

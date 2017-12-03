@@ -22,3 +22,4 @@ toggle_links_stat = ->
     $(this).next().toggle(300)
     $(this).next().next().toggle(300)
     $(this).next().next().next().toggle(300)
+    $(this).next().next().next().next().toggle(300)

@@ -48,6 +48,20 @@ module FormatDates
     end
   end
 
+  def datetime_format(step)
+    case step
+    when "month"
+      format_date = "%m.%Y"
+    when "day"
+      format_date = "%D"
+    when "hour"
+      "%D %H"
+    else
+      "%D %H:%M"
+    end
+  end
+
+
   def format_nginx_datetime
     "%d/%b/%Y:%H:%M"
   end

@@ -22,9 +22,18 @@
 //= require_tree .
 
 function humanFileSize(size) {
+  size *= 1024;
   if(size <= 0) { return size }
   var i = Math.floor( Math.log(size) / Math.log(1024) );
-  return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+  return ( size / Math.pow(1024, i) ).toFixed(2) + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+};
+
+function roundToSix(num) {
+    return +(Math.round(num + "e+6")  + "e-6");
+}
+
+function bytes_to_megabytes(size) {
+  return roundToSix(size / Math.pow(1024, 2)) + ' ' + 'MB';
 };
 
 function sleep(ms) {

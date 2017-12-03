@@ -28,6 +28,7 @@ ru:
 
   app:
     apps:
+      all_graphics: Интегральный график
       header_index: Приложения
       header_show: Ошибки приложения
       header_graph: Инфографика
@@ -58,6 +59,22 @@ ru:
       month: "%m.%Y"
       date: "%d.%m.%Y"
       time: "%H:%M:%S"
+      to_nginx: "%Y-%m-%d %H:%M:%S"
+      datetime:
+        month: "%m.%Y"
+        day: "%D"
+        hour: "%D %H"
+        minute: "%D %H:%M"
+      show_date:
+        month: "%m.%Y"
+        day: "%d.%m.%Y"
+        hour: "%d.%m.%Y %H"
+        minute: "%d.%m.%Y %H:%M"
+      c3_date:
+        month: '%Y-%m'
+        day: "%Y-%m-%d"
+        hour: '%Y-%m-%d %H'
+        minute: '%Y-%m-%d %H:%M'
   metrics:
     date: Дата
     time: Время

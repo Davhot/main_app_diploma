@@ -24,7 +24,7 @@ var chart_network;
     tooltip: {
       format: {
         value: function (value, ratio, id) {
-          return humanFileSize(value * 2 ** 10);
+          return humanFileSize(value);
         }
       }
     },
@@ -39,7 +39,7 @@ var chart_network;
       },
       y : {
         tick: {
-          format: function (value) { return humanFileSize(value * 2 ** 10) }
+          format: function (value) { return humanFileSize(value) }
         }
       }
     },
