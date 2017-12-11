@@ -11,9 +11,9 @@
     - for metric in @metrics do
       %td= l metric[0], format: :time
   %tr.show_processor
-    %td= t("metrics.cpu_average_minute")
+    %td= t("metrics.cpu_average")
     - for metric in @metrics do
-      %td= SystemMetric.cpu_average_minute_in_percent(metric[1])
+      %td= SystemMetric.cpu_average_in_percent(metric[1])
   %tr.show_memory
     %td= t("metrics.memory_used") + " (доступно #{number_to_human_size(@main_metric.memory_size * 2 ** 20)})"
     - for metric in @metrics do

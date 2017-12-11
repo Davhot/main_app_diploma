@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171105182737) do
+ActiveRecord::Schema.define(version: 20171211190838) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -91,15 +91,31 @@ ActiveRecord::Schema.define(version: 20171105182737) do
     t.index ["name"], name: "index_roles_on_name", unique: true, using: :btree
   end
 
+  create_table "system_metric_steps", force: :cascade do |t|
+    t.string   "type"
+    t.integer  "count",                default: 0
+    t.float    "cpu_average_sum",      default: 0.0
+    t.float    "cpu_average"
+    t.float    "memory_used"
+    t.float    "memory_used_sum",      default: 0.0
+    t.float    "swap_used"
+    t.float    "swap_used_sum",        default: 0.0
+    t.integer  "descriptors_used"
+    t.integer  "descriptors_used_sum", default: 0
+    t.datetime "get_time"
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
   create_table "system_metrics", force: :cascade do |t|
-    t.float    "cpu_average_minute"
+    t.float    "cpu_average"
     t.integer  "memory_used"
     t.integer  "swap_used"
     t.integer  "descriptors_used"
     t.datetime "get_time"
     t.integer  "hot_catch_app_id"
-    t.datetime "created_at",         null: false
-    t.datetime "updated_at",         null: false
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
     t.index ["hot_catch_app_id"], name: "index_system_metrics_on_hot_catch_app_id", using: :btree
   end
 

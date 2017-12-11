@@ -1,4 +1,18 @@
 FactoryGirl.define do
+  factory :system_metric_hour do
+    type ""
+    count 1
+    cpu_average_sum 1.5
+    cpu_average 1.5
+    memory_used 1.5
+    memory_used_sum 1.5
+    swap_used 1.5
+    swap_used_sum 1.5
+    descriptors_used 1
+    descriptors_used_sum 1
+    get_time "2017-12-11 22:08:38"
+    count 1
+  end
   factory :main_metric do
     memory_size 1
     swap_size 1
@@ -23,7 +37,7 @@ FactoryGirl.define do
     system_metric nil
   end
   factory :system_metric do
-    cpu_average_minute 1.5
+    cpu_average 1.5
     memory_size 1
     memory_used 1
     swap_size 1
@@ -36,7 +50,7 @@ FactoryGirl.define do
     request_time "2017-10-22 17:53:39"
   end
   factory :role_user do
-    
+
   end
   factory :role do
     name "MyString"

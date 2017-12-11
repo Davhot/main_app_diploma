@@ -1,7 +1,7 @@
 class SystemMetric < ApplicationRecord
   belongs_to :hot_catch_app
 
-  # validates :cpu_average_minute, presence: true
+  # validates :cpu_average, presence: true
   # validates :memory_size, presence: true
   # validates :memory_used, presence: true
   # validates :swap_size, presence: true
@@ -9,8 +9,8 @@ class SystemMetric < ApplicationRecord
   # validates :discriptors_max, presence: true
   # validates :descriptors_used, presence: true
 
-  def self.cpu_average_minute_in_percent(cpu_average_minute)
-    "#{(cpu_average_minute * 100).round(2)}%"
+  def self.cpu_average_in_percent(cpu_average)
+    "#{(cpu_average * 100).round(2)}%"
   end
 
   #  Возвращает массив x и y для построения графика
@@ -27,7 +27,7 @@ class SystemMetric < ApplicationRecord
     hash.each do |key, val|
       a = [0, 0, 0, 0]
       for metric in val do
-        a[0] += metric.cpu_average_minute.to_f
+        a[0] += metric.cpu_average.to_f
         a[1] += metric.memory_used.to_i * (2 ** 10)
         a[2] += metric.swap_used * (2 ** 10)
         a[3] += metric.descriptors_used

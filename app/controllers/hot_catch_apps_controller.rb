@@ -21,10 +21,13 @@ class HotCatchAppsController < ApplicationController
     gon.all_graphs_path = load_all_graphs_hot_catch_app_path(@hot_catch_app)
   end
 
+  # TODO: SystemMetric данные в процентах
   def load_all_graphs
     @step = params["all_graphs_step"].present? ? params["all_graphs_step"] : "hour"
-    @from = params["all_graphs_from"].present? ? params["all_graphs_from"] : nil
-    @to = params["all_graphs_to"].present? ? params["all_graphs_to"] : nil
+    @from = params["all_graphs_from"].present? ?
+      DateTime.strptime(params["all_graphs_from"], I18n.t("time.formats.show_date.#{@step}")) : nil
+    @to = params["all_graphs_to"].present? ?
+      DateTime.strptime(params["all_graphs_to"], I18n.t("time.formats.show_date.#{@step}")) : nil
 
     @network_links, @network_x_y = Network.get_data_graph(@hot_catch_app, @step, @from, @to) # Networks
     @x_main_metric, @y_main_metric = SystemMetric.get_data_graph(@hot_catch_app, @step, @from, @to) # MainMetrics
@@ -278,7 +281,7 @@ class HotCatchAppsController < ApplicationController
     hash.each do |key, val|
       a = [0, 0, 0, 0]
       for metric in val do
-        a[0] += metric.cpu_average_minute.to_f
+        a[0] += metric.cpu_average.to_f
         a[1] += metric.memory_used.to_i  * (2 ** 10)
         a[2] += metric.swap_used * (2 ** 10)
         a[3] += metric.descriptors_used
@@ -441,7 +444,7 @@ class HotCatchAppsController < ApplicationController
     hash.each do |key, val|
       a = [0, 0, 0, 0]
       for metric in val do
-        a[0] += metric.cpu_average_minute.to_f
+        a[0] += metric.cpu_average.to_f
         a[1] += metric.memory_used.to_i
         a[2] += metric.swap_used
         a[3] += metric.descriptors_used

@@ -46,10 +46,33 @@ class MainHotCatchLog < ApplicationRecord
   end
 
   def process_system_logs(logs)
-    metric = SystemMetric.create(cpu_average_minute: logs["cpu"]["last_minute"],
+    metric = SystemMetric.create(cpu_average: logs["cpu"]["last_minute"],
       memory_used: logs["memory"]["used"], swap_used: logs["memory"]["swap_used"],
       descriptors_used: logs["descriptors"]["current"], get_time: logs["time"],
       hot_catch_app_id: hot_catch_app.id)
+
+    # TODO: Добавить SystemMetricHour и SystemMetricDay
+    last_hour_metric = SystemMetricStep::Hour.order(:get_time).last
+    if metric.present? && metric.get_time.present?
+      time_from = metric.get_time.change({ min: 0, sec: 0 })
+      time_to = metric.get_time.change({ min: 0, sec: 0 }) + 1.hour
+      if last_hour_metric.blank? || last_hour_metric.get_time < time_from ||
+      last_hour_metric.get_time >= time_to
+        last_hour_metric = SystemMetricStep::Hour.new
+      end
+      last_hour_metric.set_attributes_system_metric_and_save(metric)
+    end
+
+    last_day_metric = SystemMetricStep::Day.order(:get_time).last
+    if metric.present? && metric.get_time.present?
+      time_from = metric.get_time.change({ hour: 0, min: 0, sec: 0 })
+      time_to = metric.get_time.change({ hour: 0, min: 0, sec: 0 }) + 1.day
+      if last_day_metric.blank? || last_day_metric.get_time < time_from ||
+      last_day_metric.get_time >= time_to
+        last_day_metric = SystemMetricStep::Day.new
+      end
+      last_day_metric.set_attributes_system_metric_and_save(metric)
+    end
 
     main_metric_attrs = {
       memory_size: logs["memory"]["size"],
