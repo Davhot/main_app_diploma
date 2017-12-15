@@ -51,24 +51,23 @@ class MainHotCatchLog < ApplicationRecord
       descriptors_used: logs["descriptors"]["current"], get_time: logs["time"],
       hot_catch_app_id: hot_catch_app.id)
 
-    # TODO: Добавить SystemMetricHour и SystemMetricDay
+    # Накопительные системные логи за час
     last_hour_metric = SystemMetricStep::Hour.order(:get_time).last
     if metric.present? && metric.get_time.present?
       time_from = metric.get_time.change({ min: 0, sec: 0 })
       time_to = metric.get_time.change({ min: 0, sec: 0 }) + 1.hour
-      if last_hour_metric.blank? || last_hour_metric.get_time < time_from ||
-      last_hour_metric.get_time >= time_to
+      if last_hour_metric.blank? || last_hour_metric.get_time.change({ min: 0, sec: 0 }) >= time_to
         last_hour_metric = SystemMetricStep::Hour.new
       end
       last_hour_metric.set_attributes_system_metric_and_save(metric)
     end
 
+    # Накопительные системные логи за день
     last_day_metric = SystemMetricStep::Day.order(:get_time).last
     if metric.present? && metric.get_time.present?
       time_from = metric.get_time.change({ hour: 0, min: 0, sec: 0 })
       time_to = metric.get_time.change({ hour: 0, min: 0, sec: 0 }) + 1.day
-      if last_day_metric.blank? || last_day_metric.get_time < time_from ||
-      last_day_metric.get_time >= time_to
+      if last_day_metric.blank? || last_day_metric.get_time.change({ hour: 0, min: 0, sec: 0 }) >= time_to
         last_day_metric = SystemMetricStep::Day.new
       end
       last_day_metric.set_attributes_system_metric_and_save(metric)
@@ -112,14 +111,39 @@ class MainHotCatchLog < ApplicationRecord
     networks = []
     logs["network"].each do |k, v|
       networks << k
-      Network.create(name: k,
+      metric = Network.create(name: k,
         bytes_in: v["bytes_in"],
         bytes_out: v["bytes_out"],
         packets_in: v["packets_in"],
         packets_out: v["packets_out"],
         get_time: logs["time"],
         hot_catch_app_id: hot_catch_app.id)
+
+      # Накопительные системные логи за час
+      last_hour_metric = NetworkStep::HourNetwork.where(name: k).order(:get_time).last
+      if metric.present? && metric.get_time.present?
+        time_from = metric.get_time.change({ min: 0, sec: 0 })
+        time_to = metric.get_time.change({ min: 0, sec: 0 }) + 1.hour
+        if last_hour_metric.blank? || last_hour_metric.get_time < time_from ||
+        last_hour_metric.get_time >= time_to
+          last_hour_metric = NetworkStep::HourNetwork.new
+        end
+        last_hour_metric.set_attributes_system_metric_and_save(metric)
+      end
+
+      # Накопительные системные логи за день
+      last_day_metric = NetworkStep::DayNetwork.where(name: k).order(:get_time).last
+      if metric.present? && metric.get_time.present?
+        time_from = metric.get_time.change({ hour: 0, min: 0, sec: 0 })
+        time_to = metric.get_time.change({ hour: 0, min: 0, sec: 0 }) + 1.day
+        if last_day_metric.blank? || last_day_metric.get_time < time_from ||
+        last_day_metric.get_time >= time_to
+          last_day_metric = NetworkStep::DayNetwork.new
+        end
+        last_day_metric.set_attributes_system_metric_and_save(metric)
+      end
     end
+
     for interface in (hot_catch_app.networks.pluck(:name) - networks) do
       Network.where(name: interface, hot_catch_app_id: hot_catch_app.id).delete_all
     end

@@ -1,4 +1,12 @@
 FactoryGirl.define do
+  factory :network_step do
+    bytes_in 1.5
+    bytes_out 1.5
+    packets_in 1.5
+    packets_out 1.5
+    get_time "2017-12-14 22:24:26"
+    hot_catch_app nil
+  end
   factory :system_metric_hour do
     type ""
     count 1

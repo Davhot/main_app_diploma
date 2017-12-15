@@ -23,14 +23,16 @@ class HotCatchAppsController < ApplicationController
 
   # TODO: SystemMetric данные в процентах
   def load_all_graphs
-    @step = params["all_graphs_step"].present? ? params["all_graphs_step"] : "hour"
+    @step = params["all_graphs_step"].present? ? params["all_graphs_step"] : "day"
     @from = params["all_graphs_from"].present? ?
       DateTime.strptime(params["all_graphs_from"], I18n.t("time.formats.show_date.#{@step}")) : nil
     @to = params["all_graphs_to"].present? ?
       DateTime.strptime(params["all_graphs_to"], I18n.t("time.formats.show_date.#{@step}")) : nil
 
-    @network_links, @network_x_y = Network.get_data_graph(@hot_catch_app, @step, @from, @to) # Networks
-    @x_main_metric, @y_main_metric = SystemMetric.get_data_graph(@hot_catch_app, @step, @from, @to) # MainMetrics
+    @network_links, @network_x_y = choose_networks_for_integrate_graph(@step)
+      .get_data_graph(@hot_catch_app, @step, @from, @to) # Networks
+    @x_main_metric, @y_main_metric = choose_system_metric_for_integrate_graph(@step)
+      .get_data_graph(@hot_catch_app, @step, @from, @to) # MainMetrics
     @x_nginx, @y_nginx = MainHotCatchLog.get_nginx_data_graph(@hot_catch_app, @step, @from, @to) # Nginx
     @x_rails, @y_rails = UserRequest.get_data_graph(@hot_catch_app, @step, @from, @to) # Rails
 
@@ -146,27 +148,26 @@ class HotCatchAppsController < ApplicationController
   # ============================================================================
   def load_network_graph
     @min_date = Network.where(hot_catch_app_id: @hot_catch_app.id)
-      .order(:get_time).first.get_time.change(:offset => DateTime.now.zone).utc
+      .order(:get_time).first.get_time.change(:offset => DateTime.current.zone).utc
     @max_date = Network.where(hot_catch_app_id: @hot_catch_app.id)
-      .order(:get_time).last.get_time.change(:offset => DateTime.now.zone).utc
+      .order(:get_time).last.get_time.change(:offset => DateTime.current.zone).utc
     # Настройки ============
     if params[:network_metric_form_step].blank?
-      @step_metric = "hour"
-      @show_time = true
+      @step_metric = "day"
     else
       @step_metric = params[:network_metric_form_step]
     end
 
     if params[:network_metric_graph_form_from].present?
       @begin_date = DateTime.strptime(params[:network_metric_graph_form_from],
-        format_show_datetime("minute")).change(:offset => DateTime.now.zone).utc
+        format_show_datetime("minute")).change(:offset => DateTime.current.zone).utc
     else
       @begin_date = @min_date
     end
 
     if params[:network_metric_graph_form_to].present?
       @end_date = DateTime.strptime(params[:network_metric_graph_form_to],
-        format_show_datetime("minute")).change(:offset => DateTime.now.zone).utc
+        format_show_datetime("minute")).change(:offset => DateTime.current.zone).utc
     else
       @end_date = @max_date
     end
@@ -197,7 +198,7 @@ class HotCatchAppsController < ApplicationController
 
     @name_networks.each_with_index do |name, index|
       @networks = []
-      networks = Network.where(hot_catch_app_id: @hot_catch_app.id, name: name).where(
+      networks = choose_network_metric(@step_metric, name).where(
         "get_time >= ? AND get_time <= ?",
         @begin_date.strftime(format_c3_date("second")),
         @end_date.strftime(format_c3_date("second"))
@@ -207,15 +208,11 @@ class HotCatchAppsController < ApplicationController
       @y << ["x#{index + 1}"]
       @x << [@y[-2][0], @y[-1][0]]
       @x << [@y[-3][0], @y[-1][0]]
-      networks.group_by{|x| x.get_time.strftime(@format_date)}.each do |key, val|
-        a = [0, 0]
-        for network in val do
-          a[0] += network.bytes_in.to_f
-          a[1] += network.bytes_out.to_f
-        end
-        @y[-3] << a[0].round(2)
-        @y[-2] << a[1].round(2)
-        @y[-1] << DateTime.strptime(key, @format_date).strftime(@parse_c3_date_format)
+
+      networks.each do |network|
+        @y[-1] << network.get_time.strftime(@parse_c3_date_format)
+        @y[-2] << network.bytes_out
+        @y[-3] << network.bytes_in
       end
     end
     # ОТОБРАЖАЕМ @x и @y
@@ -225,12 +222,12 @@ class HotCatchAppsController < ApplicationController
 
   def load_main_metric_graph
     @min_date = @hot_catch_app.system_metrics.order(:get_time).first
-      .get_time.change(:offset => DateTime.now.zone).utc
+      .get_time.change(:offset => DateTime.current.zone).utc
     @max_date = @hot_catch_app.system_metrics.order(:get_time).last
-      .get_time.change(:offset => DateTime.now.zone).utc
+      .get_time.change(:offset => DateTime.current.zone).utc
     # Настройки ============
     if params[:main_metric_form_step].blank?
-      @step_metric = "hour"
+      @step_metric = "day"
       @show_time = true
     else
       @step_metric = params[:main_metric_form_step]
@@ -238,14 +235,14 @@ class HotCatchAppsController < ApplicationController
 
     if params[:main_metric_graph_form_from].present?
       @begin_date = DateTime.strptime(params[:main_metric_graph_form_from],
-        format_show_datetime("minute")).change(:offset => DateTime.now.zone).utc
+        format_show_datetime("minute")).change(:offset => DateTime.current.zone)
     else
       @begin_date = @min_date
     end
 
     if params[:main_metric_graph_form_to].present?
       @end_date = DateTime.strptime(params[:main_metric_graph_form_to],
-        format_show_datetime("minute")).change(:offset => DateTime.now.zone).utc
+        format_show_datetime("minute")).change(:offset => DateTime.current.zone)
     else
       @end_date = @max_date
     end
@@ -277,19 +274,19 @@ class HotCatchAppsController < ApplicationController
     @x = ["x1"]
     @y = [["процессор"], ["использование памяти"],
       ["файл подкачки"], ["используемые дескрипторы"]]
-    hash = @all_metrics.group_by{|x| x.get_time.strftime(@format_date)}
-    hash.each do |key, val|
-      a = [0, 0, 0, 0]
-      for metric in val do
-        a[0] += metric.cpu_average.to_f
-        a[1] += metric.memory_used.to_i  * (2 ** 10)
-        a[2] += metric.swap_used * (2 ** 10)
-        a[3] += metric.descriptors_used
-      end
-      a.map!{|x| x /= val.size}
-      a[0] = (a[0] * 100).round(2)
-      @x << DateTime.strptime(key, @format_date).strftime(@parse_c3_date_format)
-      @y.each_with_index{|elem, index| elem << a[index]}
+
+    @all_metrics = choose_system_metric(@step_metric).where(
+      "get_time >= ? AND get_time <= ?",
+      @begin_date.strftime(format_c3_date("second")),
+      @end_date.strftime(format_c3_date("second"))
+    ).order(:get_time)
+
+    @all_metrics.each do |metric|
+      @x << metric.get_time.strftime(@parse_c3_date_format)
+      @y[0] << metric.cpu_average
+      @y[1] << metric.memory_used
+      @y[2] << metric.swap_used
+      @y[3] << metric.descriptors_used
     end
     # ОТОБРАЖАЕМ @x и @y
     render :load_main_metric_graph, :layout => false
@@ -319,27 +316,27 @@ class HotCatchAppsController < ApplicationController
   # Ajax подгрузка сетевых интерфейсов
   def get_ajax_table_network_metric
     @min_date = Network.where(hot_catch_app_id: @hot_catch_app.id)
-      .order(:get_time).first.get_time.change(:offset => DateTime.now.zone).utc
+      .order(:get_time).first.get_time.change(:offset => DateTime.current.zone)
     @max_date = Network.where(hot_catch_app_id: @hot_catch_app.id)
-      .order(:get_time).last.get_time.change(:offset => DateTime.now.zone).utc
+      .order(:get_time).last.get_time.change(:offset => DateTime.current.zone)
     # Настройки ============
     if params[:network_metric_form_step].blank?
-      @step_metric = "hour"
-      @show_time = true
+      @step_metric = "day"
+      # @show_time = true
     else
       @step_metric = params[:network_metric_form_step]
     end
 
     if params[:network_metric_table_form_from].present?
       @begin_date = DateTime.strptime(params[:network_metric_table_form_from],
-        format_show_datetime("minute")).change(:offset => DateTime.now.zone).utc
+        format_show_datetime("minute")).change(:offset => DateTime.current.zone)
     else
       @begin_date = @min_date
     end
 
     if params[:network_metric_table_form_to].present?
       @end_date = DateTime.strptime(params[:network_metric_table_form_to],
-        format_show_datetime("minute")).change(:offset => DateTime.now.zone).utc
+        format_show_datetime("minute")).change(:offset => DateTime.current.zone)
     else
       @end_date = @max_date
     end
@@ -363,20 +360,12 @@ class HotCatchAppsController < ApplicationController
 
     @name_networks.each_with_index do |name, index|
       @networks = []
-      networks = Network.where(hot_catch_app_id: @hot_catch_app.id, name: name[0]).where(
+      networks = choose_network_metric(@step_metric, name).where(
         "get_time >= ? AND get_time <= ?",
         @begin_date.strftime(format_c3_date("second")),
         @end_date.strftime(format_c3_date("second"))
       ).order(:get_time)
-      networks.group_by{|x| x.get_time.strftime(@format_date)}.each do |key, val|
-        a = [0, 0]
-        for network in val do
-          a[0] += network.bytes_in.to_f
-          a[1] += network.bytes_out.to_f
-        end
-        a.unshift(DateTime.strptime(key, @format_date))
-        @networks << a
-      end
+      networks.each{|network| @networks << [network.get_time, network.bytes_in, network.bytes_out]}
       @name_networks[index] << @networks.last(150)
     end
 
@@ -386,12 +375,12 @@ class HotCatchAppsController < ApplicationController
   # Ajax подгрузка нагрузки на систему
   def get_ajax_table_main_metric
     @main_metric = @hot_catch_app.main_metric
-    @min_time = @hot_catch_app.system_metrics.order(:get_time).first.get_time.change(:offset => DateTime.now.zone).utc
-    @max_time = @hot_catch_app.system_metrics.order(:get_time).last.get_time.change(:offset => DateTime.now.zone).utc
+    @min_time = @hot_catch_app.system_metrics.order(:get_time).first.get_time.change(:offset => DateTime.current.zone)
+    @max_time = @hot_catch_app.system_metrics.order(:get_time).last.get_time.change(:offset => DateTime.current.zone)
     # Настройки ============
     if params[:main_metric_form_step].blank?
-      @step_metric = "hour"
-      @show_time = true
+      @step_metric = "day"
+      # @show_time = true
       @show_processor = true
       @show_memory = true
       @show_swap = true
@@ -406,14 +395,14 @@ class HotCatchAppsController < ApplicationController
 
     if params[:main_metric_table_form_from].present?
       @begin_date = DateTime.strptime(params[:main_metric_table_form_from],
-        format_show_datetime("minute")).change(:offset => DateTime.now.zone).utc
+        format_show_datetime("minute")).change(:offset => DateTime.current.zone)
     else
       @begin_date = @min_time
     end
 
     if params[:main_metric_table_form_to].present?
       @end_date = DateTime.strptime(params[:main_metric_table_form_to],
-        format_show_datetime("minute")).change(:offset => DateTime.now.zone).utc
+        format_show_datetime("minute")).change(:offset => DateTime.current.zone)
     else
       @end_date = @max_time
     end
@@ -433,27 +422,15 @@ class HotCatchAppsController < ApplicationController
     end
 
 
-    @all_metrics = @hot_catch_app.system_metrics.where(
+    @all_metrics = choose_system_metric(@step_metric).where(
       "get_time >= ? AND get_time <= ?",
       @begin_date.strftime(format_c3_date("second")),
       @end_date.strftime(format_c3_date("second"))
     ).order(:get_time)
 
-    @metrics = []
-    hash = @all_metrics.group_by{|x| x.get_time.strftime(@format_date)}
-    hash.each do |key, val|
-      a = [0, 0, 0, 0]
-      for metric in val do
-        a[0] += metric.cpu_average.to_f
-        a[1] += metric.memory_used.to_i
-        a[2] += metric.swap_used
-        a[3] += metric.descriptors_used
-      end
-      a.map!{|x| x /= val.size}
-      a.unshift(DateTime.strptime(key, @format_date))
-      @metrics << a
-    end
-    @metrics = @metrics.last(100)
+    @metrics = @all_metrics.last(100).map{|metric| [
+      DateTime.strptime(metric.get_time.strftime(@format_date), @format_date),
+      metric.cpu_average, metric.memory_used, metric.swap_used, metric.descriptors_used]}
 
     render :get_ajax_table_main_metric, :layout => false
   end
@@ -565,11 +542,72 @@ class HotCatchAppsController < ApplicationController
   end
 
   private
-    def set_hot_catch_app
-      @hot_catch_app = HotCatchApp.find(params[:id])
-    end
 
-    def hot_catch_app_params
-      params.require(:hot_catch_app).permit(:name)
+  def choose_system_metric(step)
+    case step
+    when "year"
+      @hot_catch_app.system_metric_step_days
+    when "month"
+      @hot_catch_app.system_metric_step_days
+    when "day"
+      @hot_catch_app.system_metric_step_days
+    when "hour"
+      @hot_catch_app.system_metric_step_hours
+    else
+      @hot_catch_app.system_metrics
     end
+  end
+
+  def choose_system_metric_for_integrate_graph(step)
+    case step
+    when "year"
+      SystemMetricStep::Day
+    when "month"
+      SystemMetricStep::Day
+    when "day"
+      SystemMetricStep::Day
+    when "hour"
+      SystemMetricStep::Hour
+    else
+      SystemMetric
+    end
+  end
+
+  def choose_network_metric(step, network_name)
+    case step
+    when "year"
+      @hot_catch_app.network_step_days.where(name: network_name)
+    when "month"
+      @hot_catch_app.network_step_days.where(name: network_name)
+    when "day"
+      @hot_catch_app.network_step_days.where(name: network_name)
+    when "hour"
+      @hot_catch_app.network_step_hours.where(name: network_name)
+    else
+      @hot_catch_app.networks.where(name: network_name)
+    end
+  end
+
+  def choose_networks_for_integrate_graph(step)
+    case step
+    when "year"
+      NetworkStep::DayNetwork
+    when "month"
+      NetworkStep::DayNetwork
+    when "day"
+      NetworkStep::DayNetwork
+    when "hour"
+      NetworkStep::HourNetwork
+    else
+      Network
+    end
+  end
+
+  def set_hot_catch_app
+    @hot_catch_app = HotCatchApp.find(params[:id])
+  end
+
+  def hot_catch_app_params
+    params.require(:hot_catch_app).permit(:name)
+  end
 end

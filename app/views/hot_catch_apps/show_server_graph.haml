@@ -18,7 +18,7 @@
               .flex-items
                 - for type in ["year", "month", "day", "hour", "minute"] do
                   %p
-                    = radio_button_tag :network_metric_form_step, type, (type == "hour")
+                    = radio_button_tag :network_metric_form_step, type, (type == "day")
                     = label_tag ("network_metric_form_step_" + type), I18n.t(type, scope: "nginx_graph_form.step")
         .row
           .col-md-12
@@ -64,7 +64,7 @@
               .flex-items
                 - for type in ["year", "month", "day", "hour", "minute"] do
                   %p
-                    = radio_button_tag :main_metric_form_step, type, (type == "hour")
+                    = radio_button_tag :main_metric_form_step, type, (type == "day")
                     = label_tag ("main_metric_form_step_" + type), I18n.t(type, scope: "nginx_graph_form.step")
         .row
           .col-md-12

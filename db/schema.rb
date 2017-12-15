@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171211190838) do
+ActiveRecord::Schema.define(version: 20171214192426) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -58,6 +58,20 @@ ActiveRecord::Schema.define(version: 20171211190838) do
     t.index ["hot_catch_app_id"], name: "index_main_metrics_on_hot_catch_app_id", using: :btree
   end
 
+  create_table "network_steps", force: :cascade do |t|
+    t.string   "type"
+    t.string   "name"
+    t.float    "bytes_in",         default: 0.0
+    t.float    "bytes_out",        default: 0.0
+    t.float    "packets_in",       default: 0.0
+    t.float    "packets_out",      default: 0.0
+    t.datetime "get_time"
+    t.integer  "hot_catch_app_id"
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+    t.index ["hot_catch_app_id"], name: "index_network_steps_on_hot_catch_app_id", using: :btree
+  end
+
   create_table "networks", force: :cascade do |t|
     t.string   "name"
     t.float    "bytes_in"
@@ -103,8 +117,10 @@ ActiveRecord::Schema.define(version: 20171211190838) do
     t.integer  "descriptors_used"
     t.integer  "descriptors_used_sum", default: 0
     t.datetime "get_time"
+    t.integer  "hot_catch_app_id"
     t.datetime "created_at",                         null: false
     t.datetime "updated_at",                         null: false
+    t.index ["hot_catch_app_id"], name: "index_system_metric_steps_on_hot_catch_app_id", using: :btree
   end
 
   create_table "system_metrics", force: :cascade do |t|
@@ -144,9 +160,11 @@ ActiveRecord::Schema.define(version: 20171211190838) do
   add_foreign_key "disks", "hot_catch_apps"
   add_foreign_key "main_hot_catch_logs", "hot_catch_apps"
   add_foreign_key "main_metrics", "hot_catch_apps"
+  add_foreign_key "network_steps", "hot_catch_apps"
   add_foreign_key "networks", "hot_catch_apps"
   add_foreign_key "role_users", "roles"
   add_foreign_key "role_users", "users"
+  add_foreign_key "system_metric_steps", "hot_catch_apps"
   add_foreign_key "system_metrics", "hot_catch_apps"
   add_foreign_key "user_requests", "main_hot_catch_logs"
 end

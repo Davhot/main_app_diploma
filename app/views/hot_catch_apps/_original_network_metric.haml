@@ -5,7 +5,7 @@
       - if one_type_network[1]
         - for network in one_type_network[1] do
           %td= l network[0], format: :date
-    %tr
+    %tr.show_time
       %td= t("metrics.time")
       - if one_type_network[1]
         - for network in one_type_network[1] do

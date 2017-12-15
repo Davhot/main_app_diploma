@@ -1,17 +1,25 @@
-class Network < ApplicationRecord
+class NetworkStep < ApplicationRecord
   belongs_to :hot_catch_app
 
-  # Возвращает массив x и y для построения графика
-  # Формат:
-  # x: [[легенда оси y1, легенда оси x1], [легенда оси y2, легенда оси x1],
-  # [легенда оси y3, легенда оси x2], [легенда оси y4, легенда оси x2], ...]
-  # y: [[легенда оси y1, входящий трафик, исходящий, дата], [...], ...]
+  def set_attributes_system_metric_and_save(metric)
+    self.name = metric.name
+
+    self.bytes_in = self.bytes_in + metric.bytes_in
+    self.bytes_out = self.bytes_out + metric.bytes_out
+    self.packets_in = self.packets_in + metric.packets_in
+    self.packets_out = self.packets_out + metric.packets_out
+
+    self.get_time = metric.get_time
+    self.hot_catch_app = metric.hot_catch_app
+    self.save
+  end
+
   def self.get_data_graph(app, step = "minute", from = nil, to = nil)
     x, y = [], []
     name_networks = self.pluck(:name).uniq
 
     name_networks.each_with_index do |name, index|
-      networks = Network.where(hot_catch_app_id: app.id, name: name)
+      networks = self.where(hot_catch_app_id: app.id, name: name)
       networks = networks.where("get_time >= ?", I18n.l(from, format: :to_nginx)) if from
       networks = networks.where("get_time <= ?", I18n.l(to, format: :to_nginx)) if to
       networks = networks.order(:get_time)
@@ -30,5 +38,12 @@ class Network < ApplicationRecord
     end
     [x, y]
   end
+end
 
+class HourNetwork < NetworkStep
+  belongs_to :hot_catch_app
+end
+
+class DayNetwork < NetworkStep
+  belongs_to :hot_catch_app
 end
