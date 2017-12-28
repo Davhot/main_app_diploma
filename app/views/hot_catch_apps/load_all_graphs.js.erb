@@ -1,4 +1,6 @@
 var all_graphs;
+var max_values = <%== @max_values.inspect.gsub("=>", ":") %>
+
 <% if @error_date %>
   alert("Неверный формат даты")
 <% elsif @links.present? %>
@@ -14,17 +16,13 @@ var all_graphs;
         <% end %>
       },
       xFormat: '<%== I18n.t("time.formats.c3_date.#{@step}") %>',
-      columns: <%== @graph_arrays.inspect %>,
-      axes: {
-        "процессор": 'y2',
-        "используемые дескрипторы": 'y2',
-        "Nginx": 'y2',
-        "Rails": 'y2'
-      }
+      columns: <%== @percent_graph_arrays.inspect %>,
     },
     tooltip: {
       format: {
         value: function (value, ratio, id) {
+          if (id != "процессор" && max_values[id])
+            value = value * max_values[id] / 100
           if(["использование памяти", "файл подкачки"].includes(id) ){
             return humanFileSize(value);
           } else if(id == "процессор") {
@@ -47,13 +45,16 @@ var all_graphs;
           format: '<%== I18n.t("time.formats.show_date.#{@step}") %>'
         }
       },
-      y : {
+      y: {
+        min: 0,
+        max: 100,
+        padding: {
+          top: 10,
+          bottom: 0
+        },
         tick: {
-          format: function (value) { return humanFileSize(value) }
+          format: function (d) { return d + ' %'; }
         }
-      },
-      y2: {
-        show: true
       }
     },
     subchart: {

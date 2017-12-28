@@ -36,6 +36,12 @@ class HotCatchAppsController < ApplicationController
     @x_nginx, @y_nginx = MainHotCatchLog.get_nginx_data_graph(@hot_catch_app, @step, @from, @to) # Nginx
     @x_rails, @y_rails = UserRequest.get_data_graph(@hot_catch_app, @step, @from, @to) # Rails
 
+    # Максимальные значения
+    @max_values = {}
+    @network_x_y.each_with_index{|x,i| @max_values[x[0]] = x[1..-1].max if i % 3 != 2}
+    @y_main_metric.each{|x| @max_values[x[0]] = x[1..-1].max}
+    [@y_nginx, @y_rails].each{|x| @max_values[x[0]] = x[1..-1].max}
+
     @links = @network_links.dup
     @graph_arrays = @network_x_y.dup
 
@@ -44,12 +50,15 @@ class HotCatchAppsController < ApplicationController
     @links << [@y_nginx[0], @x_nginx[0]]; @graph_arrays << @x_nginx; @graph_arrays << @y_nginx
     @links << [@y_rails[0], @x_rails[0]]; @graph_arrays << @x_rails; @graph_arrays << @y_rails
 
-    str = "Networks\n" + @network_links.inspect + "\n\n" + @network_x_y.inspect + "\n\n\n"
-    str += "MainMetrics\n" + @x_main_metric.inspect + "\n\n" + @y_main_metric.inspect + "\n\n\n"
-    str += "Nginx\n" + @x_nginx.inspect + "\n\n" + @y_nginx.inspect + "\n\n\n"
-    str += "Rails\n" + @x_rails.inspect + "\n\n" + @y_rails.inspect + "\n\n\n"
-    str += "Rails\n" + @links.inspect + "\n\n" + @graph_arrays.inspect + "\n\n\n"
-    # raise str
+    # Перевод данных в проценты
+    @percent_graph_arrays = []
+    @graph_arrays.each do |x|
+      if x[0] != "процессор" && @max_values.has_key?(x[0])
+        @percent_graph_arrays << [x[0]] + x[1..-1].map{|y| y/@max_values[x[0]].to_f * 100}
+      else
+        @percent_graph_arrays << x
+      end
+    end
 
     render :load_all_graphs, :layout => false
   end

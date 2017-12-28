@@ -17,7 +17,7 @@
               .flex-items
                 - for type in ["year", "month", "day", "hour", "minute"] do
                   %p
-                    = radio_button_tag :all_graphs_step, type, (type == "hour")
+                    = radio_button_tag :all_graphs_step, type, (type == "day")
                     = label_tag ("all_graphs_step_" + type), I18n.t(type, scope: "nginx_graph_form.step")
         .row
           .col-md-12
